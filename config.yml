@@ -1,0 +1,16 @@
+## Configuration file for ClubappServer application.
+
+# Database settings.
+database:
+    # the name of the JDBC driver, mysql in our case
+    driverClass: com.mysql.jdbc.Driver
+    # the username
+    user: ${DBUSER}
+    # the password
+    password: ${DBPW}
+    # the JDBC URL
+    url: jdbc:mysql://${DBURL}
+    # any properties of JDBC driver:
+    properties:
+      charSet: UTF-8
+      hibernate.dialect: org.hibernate.dialect.MySQLDialect
