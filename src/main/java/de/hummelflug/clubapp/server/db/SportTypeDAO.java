@@ -6,9 +6,8 @@ import java.util.Optional;
 import org.hibernate.SessionFactory;
 
 import de.hummelflug.clubapp.server.core.SportType;
-import io.dropwizard.hibernate.AbstractDAO;
 
-public class SportTypeDAO extends AbstractDAO<SportType> {
+public class SportTypeDAO extends AbstractSuperDAO<SportType> {
 
 	/**
      * Constructor.

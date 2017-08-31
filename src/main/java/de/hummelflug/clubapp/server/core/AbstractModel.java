@@ -2,45 +2,39 @@ package de.hummelflug.clubapp.server.core;
 
 import java.util.Date;
 
-import javax.annotation.Nonnull;
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
-import de.hummelflug.clubapp.server.utils.ScheduleType;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+@MappedSuperclass
+public class AbstractModel {
 
-@Entity
-@Table(name = "schedule")
-@Inheritance(strategy=InheritanceType.JOINED)
-@NamedQueries({
-    @NamedQuery(name = "de.hummelflug.clubapp.server.core.Schedule.findAll",
-            query = "select s from Schedule s")
-})
-public class Schedule extends AbstractModel {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	protected Long id;
 	
-	@Column(name = "schedule_type", nullable = false)
-	@Enumerated(EnumType.STRING)
-	private ScheduleType scheduleType;
+	@CreationTimestamp
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "creation_time", nullable = false)
+	protected Date creationTime;
+	
+	@UpdateTimestamp
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "last_modification", nullable = false)
+	protected Date lastModification;
 	
 	/**
 	 * A no-argument constructor
 	 */
-	public Schedule() {
-	}
-	
-	/**
-	 * @param scheduleType type of schedule (team or user schedule)
-	 */
-	public Schedule(@Nonnull ScheduleType scheduleType) {
-		this.scheduleType = checkNotNull(scheduleType, "schedule type cannot be null");
+	public AbstractModel() {
+		
 	}
 
 	/* (non-Javadoc)
@@ -53,7 +47,6 @@ public class Schedule extends AbstractModel {
 		result = prime * result + ((creationTime == null) ? 0 : creationTime.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((lastModification == null) ? 0 : lastModification.hashCode());
-		result = prime * result + ((scheduleType == null) ? 0 : scheduleType.hashCode());
 		return result;
 	}
 
@@ -68,7 +61,7 @@ public class Schedule extends AbstractModel {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Schedule other = (Schedule) obj;
+		AbstractModel other = (AbstractModel) obj;
 		if (creationTime == null) {
 			if (other.creationTime != null)
 				return false;
@@ -83,8 +76,6 @@ public class Schedule extends AbstractModel {
 			if (other.lastModification != null)
 				return false;
 		} else if (!lastModification.equals(other.lastModification))
-			return false;
-		if (scheduleType != other.scheduleType)
 			return false;
 		return true;
 	}
@@ -129,20 +120,6 @@ public class Schedule extends AbstractModel {
 	 */
 	public void setLastModification(Date lastModification) {
 		this.lastModification = lastModification;
-	}
-
-	/**
-	 * @return the scheduleType
-	 */
-	public ScheduleType getScheduleType() {
-		return scheduleType;
-	}
-
-	/**
-	 * @param scheduleType the scheduleType to set
-	 */
-	public void setScheduleType(ScheduleType scheduleType) {
-		this.scheduleType = scheduleType;
 	}
 	
 }

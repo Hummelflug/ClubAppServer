@@ -1,6 +1,7 @@
 package de.hummelflug.clubapp.server.core;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -14,6 +15,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+
+import de.hummelflug.clubapp.server.utils.EventType;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -45,6 +48,8 @@ public class Game extends Event {
 	 * A no-argument constructor
 	 */
 	public Game() {
+		super(EventType.GAME);
+		organizers = new HashSet<Long>();
 	}
 	
 	/**
@@ -58,9 +63,10 @@ public class Game extends Event {
 	 */
 	public Game(@Nonnull Date startTime, @Nonnull Date endTime, @Nonnull Long hostTeamId
 			, @Nonnull Long guestTeamId) {
-		super(startTime, endTime);
+		super(EventType.GAME, startTime, endTime);
 		this.hostTeamId = checkNotNull(hostTeamId, "host team id cannot be null");
 		this.guestTeamId = checkNotNull(guestTeamId, "guest team id cannot be null");
+		organizers = new HashSet<Long>();
 	}
 
 	/* (non-Javadoc)

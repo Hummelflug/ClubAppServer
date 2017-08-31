@@ -3,7 +3,10 @@ package de.hummelflug.clubapp.server.resources;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -11,7 +14,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import de.hummelflug.clubapp.server.core.Club;
-import de.hummelflug.clubapp.server.db.ClubDAO;
+import de.hummelflug.clubapp.server.facade.ClubFacade;
 import io.dropwizard.hibernate.UnitOfWork;
 import io.dropwizard.jersey.params.LongParam;
 
@@ -19,19 +22,19 @@ import io.dropwizard.jersey.params.LongParam;
 @Produces(MediaType.APPLICATION_JSON)
 public class ClubRessource {
 
-	private ClubDAO clubDAO;
+	private ClubFacade clubFacade;
 	
-	public ClubRessource(ClubDAO clubDAO) {
-		this.clubDAO = clubDAO;
+	public ClubRessource(ClubFacade clubFacade) {
+		this.clubFacade = clubFacade;
 	}
 	
 	@GET
     @UnitOfWork
     public List<Club> findByName(@QueryParam("name") Optional<String> name) {
         if (name.isPresent()) {
-            return clubDAO.findByName(name.get());
+            return clubFacade.findClubByName(name.get());
         } else {
-            return clubDAO.findAll();
+            return clubFacade.findAllClubs();
         }
 	}
 	
@@ -39,7 +42,15 @@ public class ClubRessource {
     @Path("/{id}")
     @UnitOfWork
     public Optional<Club> findById(@PathParam("id") LongParam id) {
-        return clubDAO.findById(id.get());
+        return clubFacade.findClubById(id.get());
+    }
+    
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @UnitOfWork
+    public Club add(@Valid Club club) {
+        return clubFacade.createClub(club);
     }
 	
 }

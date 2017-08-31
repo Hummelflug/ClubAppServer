@@ -6,9 +6,8 @@ import java.util.Optional;
 import org.hibernate.SessionFactory;
 
 import de.hummelflug.clubapp.server.core.Game;
-import io.dropwizard.hibernate.AbstractDAO;
 
-public class GameDAO extends AbstractDAO<Game> {
+public class GameDAO extends AbstractSuperDAO<Game> {
 
 	/**
      * Constructor.

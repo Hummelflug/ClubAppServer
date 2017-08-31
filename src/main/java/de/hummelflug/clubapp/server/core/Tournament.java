@@ -8,9 +8,6 @@ import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -29,21 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
             query = "select t from Tournament t "
             + "where t.name like :name ")
 })
-public class Tournament {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	
-	@Column(name = "creation_time", nullable = false)
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date creationTime;
-	
-	@Column(name = "last_modification", nullable = false)
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date lastModification;
+public class Tournament extends AbstractModel {
 	
 	@Column(name = "name", nullable = false)
 	private String name;

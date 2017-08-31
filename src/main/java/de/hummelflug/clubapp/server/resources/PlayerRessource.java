@@ -3,7 +3,10 @@ package de.hummelflug.clubapp.server.resources;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -11,7 +14,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import de.hummelflug.clubapp.server.core.Player;
-import de.hummelflug.clubapp.server.db.PlayerDAO;
+import de.hummelflug.clubapp.server.facade.PlayerFacade;
 import io.dropwizard.hibernate.UnitOfWork;
 import io.dropwizard.jersey.params.LongParam;
 
@@ -19,19 +22,19 @@ import io.dropwizard.jersey.params.LongParam;
 @Produces(MediaType.APPLICATION_JSON)
 public class PlayerRessource {
 
-	private PlayerDAO playerDAO;
+	private PlayerFacade playerFacade;
 	
-	public PlayerRessource(PlayerDAO playerDAO) {
-		this.playerDAO = playerDAO;
+	public PlayerRessource(PlayerFacade playerFacade) {
+		this.playerFacade = playerFacade;
 	}
 	
 	@GET
     @UnitOfWork
     public List<Player> findByName(@QueryParam("name") Optional<String> name) {
         if (name.isPresent()) {
-            return playerDAO.findByName(name.get());
+            return playerFacade.findPlayerByName(name.get());
         } else {
-            return playerDAO.findAll();
+            return playerFacade.findAllPlayers();
         }
 	}
 	
@@ -39,7 +42,15 @@ public class PlayerRessource {
     @Path("/{id}")
     @UnitOfWork
     public Optional<Player> findById(@PathParam("id") LongParam id) {
-        return playerDAO.findById(id.get());
+        return playerFacade.findPlayerById(id.get());
+    }
+    
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @UnitOfWork
+    public Player add(@Valid Player player) {
+        return playerFacade.createPlayer(player);
     }
 	
 }

@@ -1,11 +1,17 @@
 package de.hummelflug.clubapp.server.core;
 
+import java.util.Date;
+
+import javax.annotation.Nonnull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+
+import de.hummelflug.clubapp.server.utils.GenderType;
+import de.hummelflug.clubapp.server.utils.UserRole;
 
 @Entity
 @Table(name = "organizer")
@@ -30,13 +36,21 @@ public class Organizer extends User {
 	 * A no-argument constructor
 	 */
 	public Organizer() {
+		super(UserRole.ORGANIZER);
 	}
 	
 	/**
-	 * 
+	 * @param lastName organizer last name
+     * @param firstName organizer first name
+     * @param birthday organizer birthday
+     * @param email organizer email
+     * @param password organizer password
+     * @param gender organizer gender
 	 * @param organization of organizer
 	 */
-	public Organizer(String organization) {
+	public Organizer(@Nonnull String lastName, @Nonnull String firstName, @Nonnull Date birthday, @Nonnull String email, 
+			@Nonnull String password, GenderType gender, String organization) {
+		super(lastName, firstName, birthday, email, password, gender, UserRole.ORGANIZER);
 		this.organization = organization;
 	}
 

@@ -1,6 +1,7 @@
 package de.hummelflug.clubapp.server.core;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -8,17 +9,12 @@ import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.hibernate.annotations.Where;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -31,21 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
             query = "select c from Club c "
             + "where c.name like :name ")
 })
-public class Club {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	
-	@Column(name = "creation_time", nullable = false)
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date creationTime;
-	
-	@Column(name = "last_modification", nullable = false)
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date lastModification;
+public class Club extends AbstractModel {
 	
 	@Column(name = "name", nullable = false)
 	private String name;
@@ -60,15 +42,13 @@ public class Club {
 	private Set<Long> teams;
 	
 	@ElementCollection
-	@CollectionTable(name = "user_current_club", joinColumns = @JoinColumn(name = "club_id"))
-	@Column(name = "user_id", nullable = false)
-	@Where(clause = "user_role = 'COACH'")
+	@CollectionTable(name = "coach_current_club", joinColumns = @JoinColumn(name = "club_id"))
+	@Column(name = "coach_id", nullable = false)
 	private Set<Long> coaches;
 	
 	@ElementCollection
-	@CollectionTable(name = "user_current_club", joinColumns = @JoinColumn(name = "club_id"))
-	@Column(name = "user_id", nullable = false)
-	@Where(clause = "user_role = 'PLAYER'")
+	@CollectionTable(name = "player_current_club", joinColumns = @JoinColumn(name = "club_id"))
+	@Column(name = "player_id", nullable = false)
 	private Set<Long> players;
 	
 	@ElementCollection
@@ -80,6 +60,8 @@ public class Club {
 	 * A no-argument constructor
 	 */
 	public Club() {
+		providedSportTypes = new HashSet<Long>();
+		teams = new HashSet<Long>();
 	}
 	
 	/**
@@ -90,6 +72,8 @@ public class Club {
      * @param foundationDate date of club foundation
      */
 	public Club(@Nonnull String name, Date foundationDate) {
+		providedSportTypes = new HashSet<Long>();
+		teams = new HashSet<Long>();
 		this.name = checkNotNull(name, "name cannot be null");
 		this.foundationDate = foundationDate;
 	}

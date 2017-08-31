@@ -1,7 +1,10 @@
 package de.hummelflug.clubapp.server.core;
 
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -12,6 +15,9 @@ import javax.persistence.NamedQuery;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SecondaryTable;
 import javax.persistence.Table;
+
+import de.hummelflug.clubapp.server.utils.GenderType;
+import de.hummelflug.clubapp.server.utils.UserRole;
 
 @Entity
 @Table(name = "player")
@@ -43,22 +49,22 @@ public class Player extends User {
 	private Set<Long> sportTypes;
 	
 	@ElementCollection
-	@CollectionTable(name = "user_current_club", joinColumns = @JoinColumn(name = "user_id"))
+	@CollectionTable(name = "player_current_club", joinColumns = @JoinColumn(name = "player_id"))
 	@Column(name = "club_id", nullable = false)
 	private Set<Long> currentClubs;
 	
 	@ElementCollection
-	@CollectionTable(name = "user_current_team", joinColumns = @JoinColumn(name = "user_id"))
+	@CollectionTable(name = "player_current_team", joinColumns = @JoinColumn(name = "player_id"))
 	@Column(name = "team_id", nullable = false)
 	private Set<Long> currentTeams;
 	
 	@ElementCollection
-	@CollectionTable(name = "user_club_history", joinColumns = @JoinColumn(name = "user_id"))
+	@CollectionTable(name = "player_club_history", joinColumns = @JoinColumn(name = "player_id"))
 	@Column(name = "club_id", nullable = false)
 	private Set<Long> clubHistory;
 	
 	@ElementCollection
-	@CollectionTable(name = "user_team_history", joinColumns = @JoinColumn(name = "user_id"))
+	@CollectionTable(name = "player_team_history", joinColumns = @JoinColumn(name = "player_id"))
 	@Column(name = "team_id", nullable = false)
 	private Set<Long> teamHistory;
 	
@@ -69,16 +75,30 @@ public class Player extends User {
 	 * A no-argument constructor
 	 */
 	public Player() {
+		super(UserRole.PLAYER);
+		clubHistory = new HashSet<Long>();
+		teamHistory = new HashSet<Long>();
+		sportTypes = new HashSet<Long>();
 	}
 	
 	/**
-	 * 
+	 * @param lastName player last name
+     * @param firstName player first name
+     * @param birthday player birthday
+     * @param email player email
+     * @param password player password
+     * @param gender player gender
 	 * @param position of player
 	 * @param shirtNumber of player
 	 */
-	public Player(String position, Integer shirtNumber) {
+	public Player(@Nonnull String lastName, @Nonnull String firstName, @Nonnull Date birthday, @Nonnull String email, 
+			@Nonnull String password, GenderType gender, String position, Integer shirtNumber) {
+		super(lastName, firstName, birthday, email, password, gender, UserRole.PLAYER);
 		this.position = position;
 		this.shirtNumber = shirtNumber;
+		clubHistory = new HashSet<Long>();
+		teamHistory = new HashSet<Long>();
+		sportTypes = new HashSet<Long>();
 	}
 
 	/* (non-Javadoc)

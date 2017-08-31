@@ -1,5 +1,10 @@
 ## Configuration file for ClubappServer application.
 
+logging:
+
+  # Permit DEBUG, INFO, WARN and ERROR messages to be logged by appenders.
+  level: INFO
+
 # Database settings.
 database:
     # the name of the JDBC driver, mysql in our case

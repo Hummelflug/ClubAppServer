@@ -2,6 +2,7 @@ package de.hummelflug.clubapp.server.core;
 
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -11,6 +12,10 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+
+import de.hummelflug.clubapp.server.utils.ScheduleType;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @Entity
 @Table(name = "team_schedule")
@@ -36,6 +41,25 @@ public class TeamSchedule extends Schedule {
 	 * A no-argument constructor
 	 */
 	public TeamSchedule() {
+		super(ScheduleType.TEAM);
+	}
+	
+	/**
+	 * @param teamId id of team
+	 */
+	public TeamSchedule(@Nonnull Long teamId) {
+		super(ScheduleType.TEAM);
+		this.teamId = checkNotNull(teamId, "team id cannot be null");
+	}
+	
+	/**
+	 * @param id of stored super class schedule
+	 * @param teamId id of team
+	 */
+	public TeamSchedule(@Nonnull Long id, @Nonnull Long teamId) {
+		super(ScheduleType.TEAM);
+		this.id = checkNotNull(id, "id cannot be null");
+		this.teamId = checkNotNull(teamId, "team id cannot be null");
 	}
 
 	/* (non-Javadoc)

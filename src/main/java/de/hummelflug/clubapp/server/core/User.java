@@ -7,9 +7,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.NamedQueries;
@@ -34,21 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
             + "where u.firstName like :name "
             + "or u.lastName like :name order by u.id asc")
 })
-public class User {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	
-	@Column(name = "creation_time", nullable = false)
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date creationTime;
-	
-	@Column(name = "last_modification", nullable = false)
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date lastModification;
+public class User extends AbstractModel {
 	
 	@Column(name = "last_name", nullable = false)
 	private String lastName;
@@ -78,6 +61,13 @@ public class User {
 	 * A no-argument constructor
 	 */
 	public User() {
+	}
+	
+	/**
+	 * @param userRole user role
+	 */
+	public User(@Nonnull UserRole userRole) {
+		this.userRole = checkNotNull(userRole, "userRole cannot be null");
 	}
 	
 	/**

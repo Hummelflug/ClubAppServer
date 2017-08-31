@@ -39,4 +39,8 @@ public class TeamScheduleDAO extends AbstractDAO<TeamSchedule> {
 		return Optional.ofNullable(get(id));
 	}
 	
+	public TeamSchedule insert(TeamSchedule ts) {
+		return persist(ts);
+	}
+	
 }

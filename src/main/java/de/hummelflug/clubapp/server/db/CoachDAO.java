@@ -6,9 +6,8 @@ import java.util.Optional;
 import org.hibernate.SessionFactory;
 
 import de.hummelflug.clubapp.server.core.Coach;
-import io.dropwizard.hibernate.AbstractDAO;
 
-public class CoachDAO extends AbstractDAO<Coach> {
+public class CoachDAO extends AbstractSuperDAO<Coach> {
 
 	/**
      * Constructor.

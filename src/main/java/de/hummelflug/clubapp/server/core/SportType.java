@@ -5,14 +5,9 @@ import java.util.Date;
 import javax.annotation.Nonnull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -22,21 +17,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
     @NamedQuery(name = "de.hummelflug.clubapp.server.core.SportType.findAll",
             query = "select s from SportType s"),
 })
-public class SportType {
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	
-	@Column(name = "creation_time", nullable = false)
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date creationTime;
-	
-	@Column(name = "last_modification", nullable = false)
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date lastModification;
+public class SportType extends AbstractModel {
 	
 	@Column(name = "name", nullable = false)
 	private String name;

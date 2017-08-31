@@ -3,7 +3,10 @@ package de.hummelflug.clubapp.server.resources;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -11,7 +14,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import de.hummelflug.clubapp.server.core.Organizer;
-import de.hummelflug.clubapp.server.db.OrganizerDAO;
+import de.hummelflug.clubapp.server.facade.OrganizerFacade;
 import io.dropwizard.hibernate.UnitOfWork;
 import io.dropwizard.jersey.params.LongParam;
 
@@ -19,19 +22,19 @@ import io.dropwizard.jersey.params.LongParam;
 @Produces(MediaType.APPLICATION_JSON)
 public class OrganizerRessource {
 
-	private OrganizerDAO organizerDAO;
+	private OrganizerFacade organizerFacade;
 	
-	public OrganizerRessource(OrganizerDAO organizerDAO) {
-		this.organizerDAO = organizerDAO;
+	public OrganizerRessource(OrganizerFacade organizerFacade) {
+		this.organizerFacade = organizerFacade;
 	}
 	
 	@GET
     @UnitOfWork
     public List<Organizer> findByName(@QueryParam("name") Optional<String> name) {
         if (name.isPresent()) {
-            return organizerDAO.findByName(name.get());
+            return organizerFacade.findOrganizerByName(name.get());
         } else {
-            return organizerDAO.findAll();
+            return organizerFacade.findAllOrganizers();
         }
 	}
 	
@@ -39,7 +42,15 @@ public class OrganizerRessource {
     @Path("/{id}")
     @UnitOfWork
     public Optional<Organizer> findById(@PathParam("id") LongParam id) {
-        return organizerDAO.findById(id.get());
+        return organizerFacade.findOrganizerById(id.get());
+    }
+    
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @UnitOfWork
+    public Organizer add(@Valid Organizer organizer) {
+    	return organizerFacade.createOrganizer(organizer);
     }
 	
 }

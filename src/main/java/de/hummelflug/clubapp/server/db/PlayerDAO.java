@@ -6,9 +6,8 @@ import java.util.Optional;
 import org.hibernate.SessionFactory;
 
 import de.hummelflug.clubapp.server.core.Player;
-import io.dropwizard.hibernate.AbstractDAO;
 
-public class PlayerDAO extends AbstractDAO<Player> {
+public class PlayerDAO extends AbstractSuperDAO<Player> {
 
 	/**
      * Constructor.
@@ -53,6 +52,10 @@ public class PlayerDAO extends AbstractDAO<Player> {
      */
 	public Optional<Player> findById(Long id) {
 		return Optional.ofNullable(get(id));
+	}
+	
+	public Player insert(Player player) {
+		return persist(player);
 	}
 
 }

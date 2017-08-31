@@ -6,9 +6,8 @@ import java.util.Optional;
 import org.hibernate.SessionFactory;
 
 import de.hummelflug.clubapp.server.core.Schedule;
-import io.dropwizard.hibernate.AbstractDAO;
 
-public class ScheduleDAO extends AbstractDAO<Schedule> {
+public class ScheduleDAO extends AbstractSuperDAO<Schedule> {
 
 	/**
      * Constructor.
