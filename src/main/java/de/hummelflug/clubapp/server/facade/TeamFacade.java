@@ -68,8 +68,10 @@ public class TeamFacade {
 		teamDAO.update(newTeam);
 		
 		//Create team schedule
-		teamScheduleDAO.insert(new TeamSchedule(newTeam.getId()));
+		TeamSchedule teamSchedule = teamScheduleDAO.insert(new TeamSchedule(newTeam.getId()));
+		newTeam.setTeamScheduleId(teamSchedule.getId());
 		
+		teamDAO.commit();
 		teamDAO.refresh(newTeam);
 		
 		return newTeam;

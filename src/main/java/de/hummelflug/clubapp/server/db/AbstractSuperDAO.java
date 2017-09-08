@@ -10,12 +10,15 @@ public class AbstractSuperDAO <E> extends AbstractDAO<E> {
 		super(sessionFactory);
 	}
 	
+	public void commit() {
+		currentSession().getTransaction().commit();
+	}
+	
 	public E insert(E e) {
 		return persist(e);
 	}
 	
 	public void refresh(E e) {
-		currentSession().getTransaction().commit();
 		currentSession().refresh(e);
 	}
 	

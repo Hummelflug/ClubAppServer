@@ -1,41 +1,23 @@
 package de.hummelflug.clubapp.server.core;
 
-import java.util.Set;
-
-import javax.annotation.Nonnull;
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Table;
 
 import de.hummelflug.clubapp.server.utils.ScheduleType;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 @Entity
-@Table(name = "team_schedule")
-@PrimaryKeyJoinColumn(name = "schedule_id")
+@DiscriminatorValue("TEAM")
 @NamedQueries({
     @NamedQuery(name = "de.hummelflug.clubapp.server.core.TeamSchedule.findAll",
             query = "select t from TeamSchedule t")
 })
 public class TeamSchedule extends Schedule {
-
-	@Column(name = "schedule_id", nullable = false)
-	private Long id;
 	
 	@Column(name = "team_id", nullable = false)
 	private Long teamId;
-	
-	@ElementCollection
-	@CollectionTable(name = "schedule_event", joinColumns = @JoinColumn(name = "schedule_id"))
-	@Column(name = "event_id", nullable = false)
-	private Set<Long> events;
 	
 	/**
 	 * A no-argument constructor
@@ -45,21 +27,13 @@ public class TeamSchedule extends Schedule {
 	}
 	
 	/**
-	 * @param teamId id of team
+	 * 
+	 * @param userId user whose schedule is defined
 	 */
-	public TeamSchedule(@Nonnull Long teamId) {
+	public TeamSchedule(Long userId) {
 		super(ScheduleType.TEAM);
-		this.teamId = checkNotNull(teamId, "team id cannot be null");
-	}
-	
-	/**
-	 * @param id of stored super class schedule
-	 * @param teamId id of team
-	 */
-	public TeamSchedule(@Nonnull Long id, @Nonnull Long teamId) {
-		super(ScheduleType.TEAM);
-		this.id = checkNotNull(id, "id cannot be null");
-		this.teamId = checkNotNull(teamId, "team id cannot be null");
+		
+		this.teamId = userId;
 	}
 
 	/* (non-Javadoc)
@@ -69,8 +43,6 @@ public class TeamSchedule extends Schedule {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((events == null) ? 0 : events.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((teamId == null) ? 0 : teamId.hashCode());
 		return result;
 	}
@@ -87,36 +59,12 @@ public class TeamSchedule extends Schedule {
 		if (getClass() != obj.getClass())
 			return false;
 		TeamSchedule other = (TeamSchedule) obj;
-		if (events == null) {
-			if (other.events != null)
-				return false;
-		} else if (!events.equals(other.events))
-			return false;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
 		if (teamId == null) {
 			if (other.teamId != null)
 				return false;
 		} else if (!teamId.equals(other.teamId))
 			return false;
 		return true;
-	}
-
-	/**
-	 * @return the id
-	 */
-	public Long getId() {
-		return id;
-	}
-
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	/**
@@ -131,20 +79,6 @@ public class TeamSchedule extends Schedule {
 	 */
 	public void setTeamId(Long teamId) {
 		this.teamId = teamId;
-	}
-
-	/**
-	 * @return the events
-	 */
-	public Set<Long> getEvents() {
-		return events;
-	}
-
-	/**
-	 * @param events the events to set
-	 */
-	public void setEvents(Set<Long> events) {
-		this.events = events;
 	}
 	
 }

@@ -3,9 +3,7 @@ package de.hummelflug.clubapp.server.db;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 
 import de.hummelflug.clubapp.server.core.Team;
 

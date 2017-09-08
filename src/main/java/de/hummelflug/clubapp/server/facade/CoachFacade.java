@@ -76,8 +76,10 @@ public class CoachFacade {
 		}
 		
 		//Create user schedule
-		userScheduleDAO.insert(new UserSchedule(newCoach.getId()));
+		UserSchedule userSchedule = userScheduleDAO.insert(new UserSchedule(newCoach.getId()));
+		newCoach.setScheduleId(userSchedule.getId());
 		
+		coachDAO.commit();
 		coachDAO.refresh(newCoach);
 		
 		return newCoach;

@@ -14,7 +14,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @MappedSuperclass
-public class AbstractModel {
+public abstract class AbstractModel {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -6,9 +6,8 @@ import java.util.Optional;
 import org.hibernate.SessionFactory;
 
 import de.hummelflug.clubapp.server.core.TeamSchedule;
-import io.dropwizard.hibernate.AbstractDAO;
 
-public class TeamScheduleDAO extends AbstractDAO<TeamSchedule> {
+public class TeamScheduleDAO extends AbstractSuperDAO<TeamSchedule> {
 
 	/**
      * Constructor.
@@ -37,10 +36,6 @@ public class TeamScheduleDAO extends AbstractDAO<TeamSchedule> {
      */
 	public Optional<TeamSchedule> findById(Long id) {
 		return Optional.ofNullable(get(id));
-	}
-	
-	public TeamSchedule insert(TeamSchedule ts) {
-		return persist(ts);
 	}
 	
 }

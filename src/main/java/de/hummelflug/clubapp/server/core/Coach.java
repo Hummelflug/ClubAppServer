@@ -25,7 +25,7 @@ import de.hummelflug.clubapp.server.utils.UserRole;
 @Table(name = "coach")
 @PrimaryKeyJoinColumn(name = "user_id")
 @SecondaryTable(name = "user_schedule",
-	pkJoinColumns=@PrimaryKeyJoinColumn(name="user_id", referencedColumnName="user_id"))
+		pkJoinColumns=@PrimaryKeyJoinColumn(name="user_id", referencedColumnName="user_id"))
 @NamedQueries({
     @NamedQuery(name = "de.hummelflug.clubapp.server.core.Coach.findAll",
             query = "select c from Coach c"),
@@ -68,7 +68,7 @@ public class Coach extends User {
 	@Column(name = "team_id", nullable = false)
 	private Set<Long> teamHistory;
 	
-	@Column(table = "user_schedule", name = "schedule_id")
+	@Column(table = "user_schedule", name = "schedule_id", nullable = false)
 	private Long scheduleId;
 	
 	/**

@@ -74,8 +74,10 @@ public class PlayerFacade {
 		}
 		
 		//Create user schedule
-		userScheduleDAO.insert(new UserSchedule(newPlayer.getId()));
+		UserSchedule userSchedule = userScheduleDAO.insert(new UserSchedule(newPlayer.getId()));
+		newPlayer.setScheduleId(userSchedule.getId());
 		
+		playerDAO.commit();
 		playerDAO.refresh(newPlayer);
 		
 		return newPlayer;

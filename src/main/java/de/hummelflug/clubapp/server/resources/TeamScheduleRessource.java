@@ -3,14 +3,17 @@ package de.hummelflug.clubapp.server.resources;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import de.hummelflug.clubapp.server.core.TeamSchedule;
-import de.hummelflug.clubapp.server.db.TeamScheduleDAO;
+import de.hummelflug.clubapp.server.facade.TeamScheduleFacade;
 import io.dropwizard.hibernate.UnitOfWork;
 import io.dropwizard.jersey.params.LongParam;
 
@@ -18,23 +21,31 @@ import io.dropwizard.jersey.params.LongParam;
 @Produces(MediaType.APPLICATION_JSON)
 public class TeamScheduleRessource {
 
-	private TeamScheduleDAO teamScheduleDAO;
+	private TeamScheduleFacade teamScheduleFacade;
 	
-	public TeamScheduleRessource(TeamScheduleDAO teamScheduleDAO) {
-		this.teamScheduleDAO = teamScheduleDAO;
+	public TeamScheduleRessource(TeamScheduleFacade teamScheduleFacade) {
+		this.teamScheduleFacade = teamScheduleFacade;
 	}
 	
 	@GET
     @UnitOfWork
     public List<TeamSchedule> findAll() {
-		return teamScheduleDAO.findAll();
+		return teamScheduleFacade.findAllTeamSchedules();
 	}
 	
     @GET
     @Path("/{id}")
     @UnitOfWork
     public Optional<TeamSchedule> findById(@PathParam("id") LongParam id) {
-        return teamScheduleDAO.findById(id.get());
+        return teamScheduleFacade.findTeamScheduleById(id.get());
+    }
+    
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @UnitOfWork
+    public TeamSchedule add(@Valid TeamSchedule teamSchedule) {
+    	return teamScheduleFacade.createTeamSchedule(teamSchedule);
     }
 	
 }

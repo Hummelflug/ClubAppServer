@@ -24,7 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Entity
 @Table(name = "team")
 @SecondaryTable(name = "team_schedule",
-	pkJoinColumns=@PrimaryKeyJoinColumn(name="team_id", referencedColumnName="id"))
+		pkJoinColumns=@PrimaryKeyJoinColumn(name="team_id", referencedColumnName="id"))
 @NamedQueries({
     @NamedQuery(name = "de.hummelflug.clubapp.server.core.Team.findAll",
             query = "select t from Team t"),
@@ -57,7 +57,7 @@ public class Team extends AbstractModel {
 	@Column(name = "player_id", nullable = false)
 	private Set<Long> players;
 	
-	@Column(table = "team_schedule", name = "schedule_id")
+	@Column(table = "team_schedule", name = "schedule_id", nullable = false)
 	private Long teamScheduleId;
 	
 	/**

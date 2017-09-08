@@ -69,6 +69,7 @@ public class ClubFacade {
 			}
 		}
 		
+		clubDAO.commit();
 		clubDAO.refresh(newClub);
 		
 		return newClub;

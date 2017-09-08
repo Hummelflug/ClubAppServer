@@ -1,20 +1,21 @@
 package de.hummelflug.clubapp.server.facade;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import de.hummelflug.clubapp.server.core.Game;
 import de.hummelflug.clubapp.server.db.GameDAO;
-import de.hummelflug.clubapp.server.db.TeamDAO;
 
 public class GameFacade {
 
 	private final GameDAO gameDAO;
-	private final TeamDAO teamDAO;
+	private final TeamScheduleFacade teamScheduleFacade;
 	
-	public GameFacade(GameDAO gameDAO, TeamDAO teamDAO) {
+	public GameFacade(GameDAO gameDAO, TeamScheduleFacade teamScheduleFacade) {
 		this.gameDAO = gameDAO;
-		this.teamDAO = teamDAO;
+		this.teamScheduleFacade = teamScheduleFacade;
 	}
 	
 	public Game createGame(Game game) {
@@ -27,6 +28,13 @@ public class GameFacade {
 			newGame.getOrganizers().add(organizerId);
 		}
 		
+		//Add event in team schedule
+		Set<Long> events = new HashSet<Long>();
+		events.add(newGame.getId());
+		teamScheduleFacade.addEventsByTeamId(game.getHostTeamId(), events);
+		teamScheduleFacade.addEventsByTeamId(game.getGuestTeamId(), events);
+		
+		gameDAO.commit();
 		gameDAO.refresh(newGame);
 		
 		return newGame;

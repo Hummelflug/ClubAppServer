@@ -1,6 +1,7 @@
 package de.hummelflug.clubapp.server.core;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -69,6 +70,10 @@ public class Tournament extends AbstractModel {
 	 * A no-argument constructor
 	 */
 	public Tournament() {
+		sportTypes = new HashSet<Long>();
+		organizers = new HashSet<Long>();
+		participants = new HashSet<Long>();
+		games = new HashSet<Long>();
 	}
 	
 	/**
@@ -88,6 +93,10 @@ public class Tournament extends AbstractModel {
 		this.endDate = endDate;
 		this.maxNumTeams = maxNumTeams;
 		this.maxRosterSize = maxRosterSize;
+		sportTypes = new HashSet<Long>();
+		organizers = new HashSet<Long>();
+		participants = new HashSet<Long>();
+		games = new HashSet<Long>();
 	}
 
 	/* (non-Javadoc)

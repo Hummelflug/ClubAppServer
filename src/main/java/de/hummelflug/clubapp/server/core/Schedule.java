@@ -1,46 +1,59 @@
 package de.hummelflug.clubapp.server.core;
 
-import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
-import javax.annotation.Nonnull;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import de.hummelflug.clubapp.server.utils.ScheduleType;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 @Entity
 @Table(name = "schedule")
-@Inheritance(strategy=InheritanceType.JOINED)
+@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name="schedule_type", discriminatorType = DiscriminatorType.STRING)
 @NamedQueries({
     @NamedQuery(name = "de.hummelflug.clubapp.server.core.Schedule.findAll",
-            query = "select s from Schedule s")
+            query = "select s from Schedule s order by s.id asc"),
 })
 public class Schedule extends AbstractModel {
 	
-	@Column(name = "schedule_type", nullable = false)
+	@Column(name = "schedule_type", nullable = false, insertable = false, updatable = false)
 	@Enumerated(EnumType.STRING)
 	private ScheduleType scheduleType;
+	
+	@ElementCollection
+	@CollectionTable(name = "schedule_event", joinColumns = @JoinColumn(name = "schedule_id"))
+	@Column(name = "event_id", nullable = false)
+	private Set<Long> events;
 	
 	/**
 	 * A no-argument constructor
 	 */
 	public Schedule() {
+		events = new HashSet<Long>();
 	}
 	
 	/**
-	 * @param scheduleType type of schedule (team or user schedule)
+	 * 
+	 * @param scheduleType type of schedule
 	 */
-	public Schedule(@Nonnull ScheduleType scheduleType) {
-		this.scheduleType = checkNotNull(scheduleType, "schedule type cannot be null");
+	public Schedule(ScheduleType scheduleType) {
+		events = new HashSet<Long>();
+		
+		this.scheduleType = scheduleType;
 	}
 
 	/* (non-Javadoc)
@@ -49,10 +62,8 @@ public class Schedule extends AbstractModel {
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((creationTime == null) ? 0 : creationTime.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((lastModification == null) ? 0 : lastModification.hashCode());
+		int result = super.hashCode();
+		result = prime * result + ((events == null) ? 0 : events.hashCode());
 		result = prime * result + ((scheduleType == null) ? 0 : scheduleType.hashCode());
 		return result;
 	}
@@ -64,71 +75,19 @@ public class Schedule extends AbstractModel {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
+		if (!super.equals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
 		Schedule other = (Schedule) obj;
-		if (creationTime == null) {
-			if (other.creationTime != null)
+		if (events == null) {
+			if (other.events != null)
 				return false;
-		} else if (!creationTime.equals(other.creationTime))
-			return false;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (lastModification == null) {
-			if (other.lastModification != null)
-				return false;
-		} else if (!lastModification.equals(other.lastModification))
+		} else if (!events.equals(other.events))
 			return false;
 		if (scheduleType != other.scheduleType)
 			return false;
 		return true;
-	}
-
-	/**
-	 * @return the id
-	 */
-	public Long getId() {
-		return id;
-	}
-
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	/**
-	 * @return the creationTime
-	 */
-	public Date getCreationTime() {
-		return creationTime;
-	}
-
-	/**
-	 * @param creationTime the creationTime to set
-	 */
-	public void setCreationTime(Date creationTime) {
-		this.creationTime = creationTime;
-	}
-
-	/**
-	 * @return the lastModification
-	 */
-	public Date getLastModification() {
-		return lastModification;
-	}
-
-	/**
-	 * @param lastModification the lastModification to set
-	 */
-	public void setLastModification(Date lastModification) {
-		this.lastModification = lastModification;
 	}
 
 	/**
@@ -143,6 +102,20 @@ public class Schedule extends AbstractModel {
 	 */
 	public void setScheduleType(ScheduleType scheduleType) {
 		this.scheduleType = scheduleType;
+	}
+
+	/**
+	 * @return the events
+	 */
+	public Set<Long> getEvents() {
+		return events;
+	}
+
+	/**
+	 * @param events the events to set
+	 */
+	public void setEvents(Set<Long> events) {
+		this.events = events;
 	}
 	
 }
