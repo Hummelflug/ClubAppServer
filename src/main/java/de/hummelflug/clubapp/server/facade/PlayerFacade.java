@@ -28,12 +28,12 @@ public class PlayerFacade {
 	}
 	
 	public Player createPlayer(Player player) {
-		//Create player to get the player id
+		/** Create player to get the player id **/
 		Player newPlayer = playerDAO.insert(new Player(player.getLastName(), player.getFirstName(), 
-				player.getBirthday(), player.getEmail(), player.getPassword(), player.getGender(), player.getPosition(),
-				player.getShirtNumber()));
+				player.getBirthday(), player.getEmail().toLowerCase(), player.getPassword(), player.getGender(),
+				player.getPosition(), player.getShirtNumber()));
 		
-		//Add team/club histories & sportTypes
+		/** Add team/club histories & sportTypes **/
 		for (Long clubId : player.getClubHistory()) {
 			newPlayer.getClubHistory().add(clubId);
 		}
@@ -46,7 +46,7 @@ public class PlayerFacade {
 			newPlayer.getSportTypes().add(sportTypeId);
 		}
 		
-		//Add player to teams and clubs if necessary
+		/** Add player to teams and clubs if necessary **/
 		if (player.getCurrentClubs() != null) {
 			Set<Long> clubIds = player.getCurrentClubs();
 			for (Long clubId : clubIds) {
@@ -73,7 +73,7 @@ public class PlayerFacade {
 			}
 		}
 		
-		//Create user schedule
+		/** Create user schedule **/
 		UserSchedule userSchedule = userScheduleDAO.insert(new UserSchedule(newPlayer.getId()));
 		newPlayer.setScheduleId(userSchedule.getId());
 		

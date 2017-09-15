@@ -83,15 +83,15 @@ public class TeamScheduleFacade {
 	}
 	
 	private void addEventsToReferencedSchedules(TeamSchedule teamSchedule, Team team, Set<Long> events) {
-		//Add events to team schedule
+		/** Add events to team schedule **/
 		for (Long eventId : events) {
 			teamSchedule.getEvents().add(eventId);
 		}
 		
-		//Add events to coaches schedule
+		/** Add events to coaches schedule **/
 		addEventsToCoachSchedules(team.getCoaches(), events);
 		
-		//Add events to players schedule
+		/** Add events to players schedule **/
 		addEventsToPlayerSchedules(team.getPlayers(), events);
 	}
 	

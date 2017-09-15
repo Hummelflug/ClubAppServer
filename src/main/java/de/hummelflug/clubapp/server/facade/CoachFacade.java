@@ -29,11 +29,11 @@ public class CoachFacade {
 	
 	public Coach createCoach(Coach coach) {
 		
-		//Create coach to get the coach id
+		/** Create coach to get the coach id **/
 		Coach newCoach = coachDAO.insert(new Coach(coach.getLastName(), coach.getFirstName(), coach.getBirthday(),
-				coach.getEmail(), coach.getPassword(), coach.getGender(), coach.getPosition()));
+				coach.getEmail().toLowerCase(), coach.getPassword(), coach.getGender(), coach.getPosition()));
 		
-		//Add team/club histories & sportTypes
+		/** Add team/club histories & sportTypes **/
 		for (Long clubId : coach.getClubHistory()) {
 			newCoach.getClubHistory().add(clubId);
 		}
@@ -48,7 +48,7 @@ public class CoachFacade {
 		
 		coachDAO.update(newCoach);
 		
-		//Add coach to teams and clubs if necessary
+		/** Add coach to teams and clubs if necessary **/
 		if (coach.getCurrentClubs() != null) {
 			Set<Long> clubIds = coach.getCurrentClubs();
 			for (Long clubId : clubIds) {
@@ -75,7 +75,7 @@ public class CoachFacade {
 			}
 		}
 		
-		//Create user schedule
+		/**Create user schedule **/
 		UserSchedule userSchedule = userScheduleDAO.insert(new UserSchedule(newCoach.getId()));
 		newCoach.setScheduleId(userSchedule.getId());
 		

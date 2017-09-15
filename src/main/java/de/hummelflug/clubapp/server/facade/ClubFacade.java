@@ -25,10 +25,10 @@ public class ClubFacade {
 	
 	public Club createClub(Club club) {
 		
-		//Create club to get club id
+		/** Create club to get club id **/
 		Club newClub = clubDAO.insert(new Club(club.getName(), club.getFoundationDate()));
 		
-		//Add provided sportTypes & teams
+		/** Add provided sportTypes & teams **/
 		for (Long sportTypeId : club.getProvidedSportTypes()) {
 			newClub.getProvidedSportTypes().add(sportTypeId);
 		}
@@ -37,7 +37,7 @@ public class ClubFacade {
 			newClub.getTeams().add(teamId);
 		}
 				
-		//Change current clubs and history of coach
+		/** Change current clubs and history of coach **/
 		if (club.getPlayers() != null) {
 			Set<Long> coachIds = club.getCoaches();
 			for (Long coachId : coachIds) {
@@ -53,7 +53,7 @@ public class ClubFacade {
 			}
 		}
 
-		//Change current clubs and history of players
+		/** Change current clubs and history of players **/
 		if (club.getPlayers() != null) {
 			Set<Long> playerIds = club.getPlayers();
 			for (Long playerId : playerIds) {

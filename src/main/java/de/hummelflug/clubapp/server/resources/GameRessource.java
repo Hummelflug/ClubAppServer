@@ -3,6 +3,7 @@ package de.hummelflug.clubapp.server.resources;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -14,10 +15,12 @@ import javax.ws.rs.core.MediaType;
 
 import de.hummelflug.clubapp.server.core.Game;
 import de.hummelflug.clubapp.server.facade.GameFacade;
+import de.hummelflug.clubapp.server.utils.UserRole;
 import io.dropwizard.hibernate.UnitOfWork;
 import io.dropwizard.jersey.params.LongParam;
 
 @Path("/game")
+@RolesAllowed(UserRole.Constants.ADMIN_VALUE)
 @Produces(MediaType.APPLICATION_JSON)
 public class GameRessource {
 

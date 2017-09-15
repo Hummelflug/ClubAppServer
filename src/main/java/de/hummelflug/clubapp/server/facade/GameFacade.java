@@ -19,16 +19,16 @@ public class GameFacade {
 	}
 	
 	public Game createGame(Game game) {
-		//Create game to get the game id
+		/** Create game to get the game id **/
 		Game newGame = gameDAO.insert(new Game(game.getStartTime(), game.getEndTime(), game.getHostTeamId(),
 				game.getGuestTeamId()));
 		
-		//Add organizers
+		/** Add organizers **/
 		for (Long organizerId : game.getOrganizers()) {
 			newGame.getOrganizers().add(organizerId);
 		}
 		
-		//Add event in team schedule
+		/** Add event in team schedule **/
 		Set<Long> events = new HashSet<Long>();
 		events.add(newGame.getId());
 		teamScheduleFacade.addEventsByTeamId(game.getHostTeamId(), events);

@@ -1,5 +1,9 @@
 package de.hummelflug.clubapp.server;
 
+import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
+
+import de.hummelflug.clubapp.server.auth.UserAuthenticator;
+import de.hummelflug.clubapp.server.auth.UserAuthorizer;
 import de.hummelflug.clubapp.server.core.Club;
 import de.hummelflug.clubapp.server.core.Coach;
 import de.hummelflug.clubapp.server.core.Event;
@@ -41,6 +45,7 @@ import de.hummelflug.clubapp.server.facade.TeamFacade;
 import de.hummelflug.clubapp.server.facade.TeamScheduleFacade;
 import de.hummelflug.clubapp.server.facade.TournamentFacade;
 import de.hummelflug.clubapp.server.facade.TrainingFacade;
+import de.hummelflug.clubapp.server.facade.UserFacade;
 import de.hummelflug.clubapp.server.facade.UserScheduleFacade;
 import de.hummelflug.clubapp.server.resources.ClubRessource;
 import de.hummelflug.clubapp.server.resources.CoachRessource;
@@ -58,10 +63,14 @@ import de.hummelflug.clubapp.server.resources.TrainingRessource;
 import de.hummelflug.clubapp.server.resources.UserRessource;
 import de.hummelflug.clubapp.server.resources.UserScheduleRessource;
 import io.dropwizard.Application;
+import io.dropwizard.auth.AuthDynamicFeature;
+import io.dropwizard.auth.AuthValueFactoryProvider;
+import io.dropwizard.auth.basic.BasicCredentialAuthFilter;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.hibernate.HibernateBundle;
+import io.dropwizard.hibernate.UnitOfWorkAwareProxyFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
@@ -111,7 +120,7 @@ public class ClubAppServerApplication extends Application<ClubAppServerConfigura
     public void initialize(final Bootstrap<ClubAppServerConfiguration> bootstrap) {
     	bootstrap.addBundle(hibernateBundle);
     	
-    	// Enable variable substitution with environment variables
+    	/** Enable variable substitution with environment variables **/
         bootstrap.setConfigurationSourceProvider(
                 new SubstitutingSourceProvider(bootstrap.getConfigurationSourceProvider(),
                                                    new EnvironmentVariableSubstitutor()
@@ -152,6 +161,20 @@ public class ClubAppServerApplication extends Application<ClubAppServerConfigura
         final TeamFacade teamFacade = new TeamFacade(coachDAO, playerDAO, teamDAO, teamScheduleDAO);    
         final TournamentFacade tournamentFacade = new TournamentFacade(tournamentDAO);
         final TrainingFacade trainingFacade = new TrainingFacade(teamScheduleFacade, trainingDAO);
+        final UserFacade userFacade = new UserFacade(userDAO);
+        
+        /** Set up authentication **/
+        UserAuthenticator authenticator = new UnitOfWorkAwareProxyFactory(hibernateBundle)
+        		.create(UserAuthenticator.class, UserDAO.class, userDAO);
+        
+        environment.jersey().register(new AuthDynamicFeature(
+                new BasicCredentialAuthFilter.Builder<User>()
+                    .setAuthenticator(authenticator)
+                    .setAuthorizer(new UserAuthorizer())
+                    .setRealm("SUPER SECRET STUFF")
+                    .buildAuthFilter()));
+        environment.jersey().register(RolesAllowedDynamicFeature.class);
+        environment.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
         
         environment.jersey().register(new ClubRessource(clubFacade));
         environment.jersey().register(new CoachRessource(coachFacade));
@@ -166,8 +189,9 @@ public class ClubAppServerApplication extends Application<ClubAppServerConfigura
         environment.jersey().register(new TeamScheduleRessource(teamScheduleFacade));
         environment.jersey().register(new TournamentRessource(tournamentFacade));
         environment.jersey().register(new TrainingRessource(trainingFacade));
-        environment.jersey().register(new UserRessource(userDAO));
+        environment.jersey().register(new UserRessource(userFacade));
         environment.jersey().register(new UserScheduleRessource(userScheduleFacade));
+
     }
 
 }

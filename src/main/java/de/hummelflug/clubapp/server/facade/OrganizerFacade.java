@@ -16,8 +16,8 @@ public class OrganizerFacade {
 	
 	public Organizer createOrganizer(Organizer organizer) {
 		return organizerDAO.insert(new Organizer(organizer.getLastName(), organizer.getFirstName(),
-				organizer.getBirthday(), organizer.getEmail(), organizer.getPassword(), organizer.getGender(),
-				organizer.getOrganization()));
+				organizer.getBirthday(), organizer.getEmail().toLowerCase(), organizer.getPassword(),
+				organizer.getGender(), organizer.getOrganization()));
 	}
 	
 	public List<Organizer> findAllOrganizers() {

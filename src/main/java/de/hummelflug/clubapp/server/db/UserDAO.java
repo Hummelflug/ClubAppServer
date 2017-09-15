@@ -28,6 +28,17 @@ public class UserDAO extends AbstractSuperDAO<User> {
 	}
 	
 	/**
+     * Looks for user whose email equals the passed parameter.
+     * 
+     * @param email query parameter
+     * @return List containing the found user
+     */
+	public List<User> findByEmail(String email) {
+		return list(namedQuery("de.hummelflug.clubapp.server.core.User.findByEmail")
+				.setParameter("email", email));
+	}
+	
+	/**
      * Looks for users whose first or last name contains the passed
      * parameter as a substring.
      * 

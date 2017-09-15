@@ -1,7 +1,18 @@
 ## Configuration file for ClubappServer application.
 
-logging:
+# Server configuration.
+server:
+  applicationConnectors:
+    - type: http
+      port: 8080
+    #- type: https
+    #  keyStorePassword: KEYSTOREPW
+    #  keyStorePath: keystore.jks
+    #  port: 8443
+    #  validateCerts: false
 
+# Logging configuration.
+logging:
   # Permit DEBUG, INFO, WARN and ERROR messages to be logged by appenders.
   level: INFO
 
@@ -15,7 +26,7 @@ database:
     password: ${DBPW}
     # the JDBC URL
     url: jdbc:mysql://${DBURL}
-    # any properties of JDBC driver:
+    # any properties of JDBC driver
     properties:
       charSet: UTF-8
       hibernate.dialect: org.hibernate.dialect.MySQLDialect

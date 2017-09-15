@@ -29,11 +29,11 @@ public class TeamFacade {
 	
 	public Team createTeam(Team team) {
 		
-		//Create team to get the team id
+		/** Create team to get the team id **/
 		Team newTeam = teamDAO.insert(new Team(team.getName(), team.getGender(), team.getAgeClass(),
 				team.getSportTypeId()));
 		
-		//Change current teams and history of coach
+		/** Change current teams and history of coach **/
 		if (team.getPlayers() != null) {
 			Set<Long> coachIds = team.getCoaches();
 			for (Long coachId : coachIds) {
@@ -49,7 +49,7 @@ public class TeamFacade {
 			}
 		}
 
-		//Change current teams and history of players
+		/** Change current teams and history of players **/
 		if (team.getPlayers() != null) {
 			Set<Long> playerIds = team.getPlayers();
 			for (Long playerId : playerIds) {
@@ -67,7 +67,7 @@ public class TeamFacade {
 		
 		teamDAO.update(newTeam);
 		
-		//Create team schedule
+		/** Create team schedule **/
 		TeamSchedule teamSchedule = teamScheduleDAO.insert(new TeamSchedule(newTeam.getId()));
 		newTeam.setTeamScheduleId(teamSchedule.getId());
 		

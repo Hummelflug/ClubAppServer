@@ -22,12 +22,12 @@ public class TrainingFacade {
 		Training newTraining = trainingDAO.insert(new Training(training.getStartTime(), training.getEndTime(),
 				training.getTeamId()));
 		
-		//Add exercises
+		/** Add exercises **/
 		for (Long exerciseId : training.getExercises()) {
 			newTraining.getExercises().add(exerciseId);
 		}
 		
-		//Add event in team schedule
+		/** Add event in team schedule **/
 		Set<Long> events = new HashSet<Long>();
 		events.add(newTraining.getId());
 		teamScheduleFacade.addEventsByTeamId(training.getTeamId(), events);

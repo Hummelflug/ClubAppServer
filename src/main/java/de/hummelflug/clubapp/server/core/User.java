@@ -1,5 +1,6 @@
 package de.hummelflug.clubapp.server.core;
 
+import java.security.Principal;
 import java.util.Date;
 
 import javax.annotation.Nonnull;
@@ -26,12 +27,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @NamedQueries({
     @NamedQuery(name = "de.hummelflug.clubapp.server.core.User.findAll",
             query = "select u from User u order by u.id asc"),
+    @NamedQuery(name = "de.hummelflug.clubapp.server.core.User.findByEmail",
+		    query = "select u from User u "
+		    + "where u.email = :email"),
     @NamedQuery(name = "de.hummelflug.clubapp.server.core.User.findByName",
             query = "select u from User u "
             + "where u.firstName like :name "
             + "or u.lastName like :name order by u.id asc")
 })
-public class User extends AbstractModel {
+public class User extends AbstractModel implements Principal {
 	
 	@Column(name = "last_name", nullable = false)
 	private String lastName;
@@ -310,6 +314,14 @@ public class User extends AbstractModel {
 	 */
 	public void setUserRole(UserRole userRole) {
 		this.userRole = userRole;
+	}
+
+	/**
+	 * @return the name (necessary for Principal)
+	 */
+	@Override
+	public String getName() {
+		return email;
 	}
 	
 }
