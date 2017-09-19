@@ -1,5 +1,7 @@
 package de.hummelflug.clubapp.server.auth;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,8 +28,12 @@ public class UserAuthenticator implements Authenticator<BasicCredentials, User> 
 		if (userList.size() == 1) {
 			User user = userList.get(0);
 			if (user != null) {
-				if (credentials.getPassword().equals(user.getPassword())) {
-					return Optional.of(user);
+				try {
+					if (PasswordHashHelper.validatePassword(credentials.getPassword(), user.getPassword())) {
+						return Optional.of(user);
+					}
+				} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+					e.printStackTrace();
 				}
 			}
 		}

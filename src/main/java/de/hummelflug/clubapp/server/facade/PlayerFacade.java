@@ -1,9 +1,12 @@
 package de.hummelflug.clubapp.server.facade;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import de.hummelflug.clubapp.server.auth.PasswordHashHelper;
 import de.hummelflug.clubapp.server.core.Club;
 import de.hummelflug.clubapp.server.core.Player;
 import de.hummelflug.clubapp.server.core.Team;
@@ -27,10 +30,11 @@ public class PlayerFacade {
 		this.userScheduleDAO = userScheduleDAO;
 	}
 	
-	public Player createPlayer(Player player) {
+	public Player createPlayer(Player player) throws NoSuchAlgorithmException, InvalidKeySpecException {
 		/** Create player to get the player id **/
 		Player newPlayer = playerDAO.insert(new Player(player.getLastName(), player.getFirstName(), 
-				player.getBirthday(), player.getEmail().toLowerCase(), player.getPassword(), player.getGender(),
+				player.getBirthday(), player.getEmail().toLowerCase(), 
+				PasswordHashHelper.generatePasswordHash(player.getPassword()), player.getGender(),
 				player.getPosition(), player.getShirtNumber()));
 		
 		/** Add team/club histories & sportTypes **/

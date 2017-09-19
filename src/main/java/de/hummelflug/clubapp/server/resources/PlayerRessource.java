@@ -1,5 +1,7 @@
 package de.hummelflug.clubapp.server.resources;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +14,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
 import de.hummelflug.clubapp.server.core.Player;
@@ -53,7 +56,11 @@ public class PlayerRessource {
     @Produces(MediaType.APPLICATION_JSON)
     @UnitOfWork
     public Player add(@Valid Player player) {
-        return playerFacade.createPlayer(player);
+        try {
+			return playerFacade.createPlayer(player);
+		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+			throw new WebApplicationException(400);
+		}
     }
 	
 }

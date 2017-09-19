@@ -1,5 +1,7 @@
 package de.hummelflug.clubapp.server.resources;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +14,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
 import de.hummelflug.clubapp.server.core.Coach;
@@ -53,7 +56,11 @@ public class CoachRessource {
     @Produces(MediaType.APPLICATION_JSON)
     @UnitOfWork
     public Coach add(@Valid Coach coach) {
-    	return coachFacade.createCoach(coach);
+    	try {
+			return coachFacade.createCoach(coach);
+		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+			throw new WebApplicationException(400);
+		}
     }
     
 }
