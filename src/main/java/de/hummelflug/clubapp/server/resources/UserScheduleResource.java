@@ -13,42 +13,42 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import de.hummelflug.clubapp.server.core.Game;
-import de.hummelflug.clubapp.server.facade.GameFacade;
+import de.hummelflug.clubapp.server.core.UserSchedule;
+import de.hummelflug.clubapp.server.facade.UserScheduleFacade;
 import de.hummelflug.clubapp.server.utils.UserRole;
 import io.dropwizard.hibernate.UnitOfWork;
 import io.dropwizard.jersey.params.LongParam;
 
-@Path("/game")
+@Path("/user_schedule")
 @RolesAllowed(UserRole.Constants.ADMIN_VALUE)
 @Produces(MediaType.APPLICATION_JSON)
-public class GameRessource {
+public class UserScheduleResource {
 
-	private GameFacade gameFacade;
+	private UserScheduleFacade userScheduleFacade;
 	
-	public GameRessource(GameFacade gameFacade) {
-		this.gameFacade = gameFacade;
+	public UserScheduleResource(UserScheduleFacade userScheduleFacade) {
+		this.userScheduleFacade = userScheduleFacade;
 	}
 	
 	@GET
     @UnitOfWork
-    public List<Game> findAll() {
-        return gameFacade.findAllGames();
+    public List<UserSchedule> findAll() {
+		return userScheduleFacade.findAllUserSchedules();
 	}
 	
     @GET
     @Path("/{id}")
     @UnitOfWork
-    public Optional<Game> findById(@PathParam("id") LongParam id) {
-        return gameFacade.findGameById(id.get());
+    public Optional<UserSchedule> findById(@PathParam("id") LongParam id) {
+        return userScheduleFacade.findUserScheduleById(id.get());
     }
     
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @UnitOfWork
-    public Game add(@Valid Game game) {
-    	return gameFacade.createGame(game);
+    public UserSchedule add(@Valid UserSchedule userSchedule) {
+    	return userScheduleFacade.createUserSchedule(userSchedule);
     }
 	
 }

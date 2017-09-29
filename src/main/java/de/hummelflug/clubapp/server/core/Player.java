@@ -77,6 +77,8 @@ public class Player extends User {
 	public Player() {
 		super(UserRole.PLAYER);
 		clubHistory = new HashSet<Long>();
+		currentClubs = new HashSet<Long>();
+		currentTeams = new HashSet<Long>();
 		teamHistory = new HashSet<Long>();
 		sportTypes = new HashSet<Long>();
 	}
@@ -97,6 +99,8 @@ public class Player extends User {
 		this.position = position;
 		this.shirtNumber = shirtNumber;
 		clubHistory = new HashSet<Long>();
+		currentClubs = new HashSet<Long>();
+		currentTeams = new HashSet<Long>();
 		teamHistory = new HashSet<Long>();
 		sportTypes = new HashSet<Long>();
 	}

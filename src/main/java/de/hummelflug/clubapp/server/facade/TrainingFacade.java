@@ -1,11 +1,10 @@
 package de.hummelflug.clubapp.server.facade;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import de.hummelflug.clubapp.server.core.Training;
+import de.hummelflug.clubapp.server.core.User;
 import de.hummelflug.clubapp.server.db.TrainingDAO;
 
 public class TrainingFacade {
@@ -18,9 +17,9 @@ public class TrainingFacade {
 		this.trainingDAO = trainingDAO;
 	}
 	
-	public Training createTraining(Training training) {
-		Training newTraining = trainingDAO.insert(new Training(training.getStartTime(), training.getEndTime(),
-				training.getTeamId()));
+	public Training createTraining(User user, Training training) {
+		Training newTraining = trainingDAO.insert(new Training(user.getId(), training.getStartTime(),
+				training.getEndTime(), training.getTeamId()));
 		
 		/** Add exercises **/
 		for (Long exerciseId : training.getExercises()) {
@@ -28,9 +27,7 @@ public class TrainingFacade {
 		}
 		
 		/** Add event in team schedule **/
-		Set<Long> events = new HashSet<Long>();
-		events.add(newTraining.getId());
-		teamScheduleFacade.addEventsByTeamId(training.getTeamId(), events);
+		teamScheduleFacade.addEventByTeamId(user, training.getTeamId(), newTraining.getId());
 		
 		return newTraining;
 	}

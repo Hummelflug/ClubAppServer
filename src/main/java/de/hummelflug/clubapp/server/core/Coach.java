@@ -76,7 +76,10 @@ public class Coach extends User {
 	 */
 	public Coach() {
 		super(UserRole.COACH);
+		
 		clubHistory = new HashSet<Long>();
+		currentClubs = new HashSet<Long>();
+		currentTeams = new HashSet<Long>();
 		teamHistory = new HashSet<Long>();
 		sportTypes = new HashSet<Long>();
 	}
@@ -93,8 +96,12 @@ public class Coach extends User {
 	public Coach(@Nonnull String lastName, @Nonnull String firstName, @Nonnull Date birthday, @Nonnull String email, 
 			@Nonnull String password, GenderType gender, String position) {
 		super(lastName, firstName, birthday, email, password, gender, UserRole.COACH);
+		
 		this.position = position;
+		
 		clubHistory = new HashSet<Long>();
+		currentClubs = new HashSet<Long>();
+		currentTeams = new HashSet<Long>();
 		teamHistory = new HashSet<Long>();
 		sportTypes = new HashSet<Long>();
 	}

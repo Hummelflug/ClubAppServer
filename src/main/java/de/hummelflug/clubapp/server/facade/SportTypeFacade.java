@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import de.hummelflug.clubapp.server.core.SportType;
+import de.hummelflug.clubapp.server.core.User;
 import de.hummelflug.clubapp.server.db.SportTypeDAO;
 
 public class SportTypeFacade {
@@ -14,8 +15,8 @@ public class SportTypeFacade {
 		this.sportTypeDAO = sportTypeDAO;
 	};
 	
-	public SportType createSportType(SportType sportType) {	
-		return sportTypeDAO.insert(new SportType(sportType.getName(), sportType.getMaxSquadSize(),
+	public SportType createSportType(User user, SportType sportType) {	
+		return sportTypeDAO.insert(new SportType(user.getId(), sportType.getName(), sportType.getMaxSquadSize(),
 				sportType.getFieldLength(), sportType.getFieldWidth()));
 	}
 	

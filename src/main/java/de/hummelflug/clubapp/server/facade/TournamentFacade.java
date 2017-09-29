@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import de.hummelflug.clubapp.server.core.Tournament;
+import de.hummelflug.clubapp.server.core.User;
 import de.hummelflug.clubapp.server.db.TournamentDAO;
 
 public class TournamentFacade {
@@ -14,9 +15,10 @@ public class TournamentFacade {
 		this.tournamentDAO = tournamentDAO;
 	}
 	
-	public Tournament createTournament(Tournament tournament) {
-		Tournament newTournament = tournamentDAO.insert(new Tournament(tournament.getName(), tournament.getStartDate(),
-				tournament.getEndDate(), tournament.getMaxNumTeams(), tournament.getMaxRosterSize()));
+	public Tournament createTournament(User user, Tournament tournament) {
+		Tournament newTournament = tournamentDAO.insert(new Tournament(user.getId(), tournament.getName(),
+				tournament.getStartDate(), tournament.getEndDate(), tournament.getMaxNumTeams(),
+				tournament.getMaxRosterSize()));
 		
 		for (Long sportTypeId : tournament.getSportTypes()) {
 			newTournament.getSportTypes().add(sportTypeId);

@@ -1,17 +1,23 @@
 package de.hummelflug.clubapp.server.facade;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import javax.ws.rs.WebApplicationException;
 
 import de.hummelflug.clubapp.server.core.Coach;
 import de.hummelflug.clubapp.server.core.Player;
 import de.hummelflug.clubapp.server.core.Team;
 import de.hummelflug.clubapp.server.core.TeamSchedule;
+import de.hummelflug.clubapp.server.core.User;
 import de.hummelflug.clubapp.server.db.CoachDAO;
 import de.hummelflug.clubapp.server.db.PlayerDAO;
 import de.hummelflug.clubapp.server.db.TeamDAO;
 import de.hummelflug.clubapp.server.db.TeamScheduleDAO;
+import de.hummelflug.clubapp.server.utils.UserRole;
 
 public class TeamScheduleFacade {
 
@@ -45,23 +51,28 @@ public class TeamScheduleFacade {
 			return newTeamSchedule;
 		}
 		
-		return null;
+		throw new WebApplicationException(400);
 	}
 	
-	public TeamSchedule addEventsByTeamId(Long teamId, Set<Long> events) {
+	public TeamSchedule addEventByTeamId(User user, Long teamId, Long eventId) {
 		Optional<Team> teamOptional = teamDAO.findById(teamId);
-		if (teamOptional.isPresent()) {
+		if (teamOptional.isPresent() && eventId != null) {
 			Team team = teamOptional.get();
-			return addEventsByScheduleId(team.getSportTypeId(), events);
+			if (team.getCoaches().contains(user.getId()) || team.getBoard().contains(user.getId()) 
+					|| user.getUserRole().equals(UserRole.ADMIN)) {
+				return addEventsByScheduleId(user, team.getTeamScheduleId(), eventId);
+			} else {
+				throw new WebApplicationException(401);
+			}
+		} else {
+			throw new WebApplicationException(400);
 		}
-		
-		return null;
 	}
 	
-	public TeamSchedule addEventsByScheduleId(Long scheduleId, Set<Long> events) {
+	public TeamSchedule addEventsByScheduleId(User user, Long scheduleId, Long eventId) {
 		Optional<TeamSchedule> teamScheduleOptional = findTeamScheduleById(scheduleId);
 		
-		if (teamScheduleOptional.isPresent()) {
+		if (teamScheduleOptional.isPresent() && eventId != null) {
 			TeamSchedule teamSchedule = teamScheduleOptional.get();
 			
 			Optional<Team> teamOptional = teamDAO.findById(teamSchedule.getTeamId());
@@ -69,17 +80,18 @@ public class TeamScheduleFacade {
 				
 				Team team = teamOptional.get();
 				
-				addEventsToReferencedSchedules(teamSchedule, team, events);
-				
-				teamScheduleDAO.refresh(teamSchedule);
-				
-				return teamSchedule;
+				if (team.getCoaches().contains(user.getId()) || user.getUserRole().equals(UserRole.ADMIN) 
+						|| user.getUserRole().equals(UserRole.ORGANIZER)) {
+					addEventsToReferencedSchedules(teamSchedule, team,
+							new HashSet<Long>(Arrays.asList(new Long[] { eventId })));
+					
+					return teamScheduleDAO.update(teamSchedule);
+				} else {
+					throw new WebApplicationException(401);
+				}
 			}
 		}
-		
-		
-		
-		return null;
+		throw new WebApplicationException(400);
 	}
 	
 	private void addEventsToReferencedSchedules(TeamSchedule teamSchedule, Team team, Set<Long> events) {

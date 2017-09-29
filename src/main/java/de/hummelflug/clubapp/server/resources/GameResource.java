@@ -13,42 +13,44 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import de.hummelflug.clubapp.server.core.Training;
-import de.hummelflug.clubapp.server.facade.TrainingFacade;
+import de.hummelflug.clubapp.server.core.Game;
+import de.hummelflug.clubapp.server.core.User;
+import de.hummelflug.clubapp.server.facade.GameFacade;
 import de.hummelflug.clubapp.server.utils.UserRole;
+import io.dropwizard.auth.Auth;
 import io.dropwizard.hibernate.UnitOfWork;
 import io.dropwizard.jersey.params.LongParam;
 
-@Path("/training")
+@Path("/game")
 @RolesAllowed(UserRole.Constants.ADMIN_VALUE)
 @Produces(MediaType.APPLICATION_JSON)
-public class TrainingRessource {
+public class GameResource {
 
-	private TrainingFacade trainingFacade;
+	private GameFacade gameFacade;
 	
-	public TrainingRessource(TrainingFacade trainingFacade) {
-		this.trainingFacade = trainingFacade;
+	public GameResource(GameFacade gameFacade) {
+		this.gameFacade = gameFacade;
 	}
 	
 	@GET
     @UnitOfWork
-    public List<Training> findAll() {
-		return trainingFacade.findAllTrainings();
+    public List<Game> findAll() {
+        return gameFacade.findAllGames();
 	}
 	
-	@GET
-	@Path("/{id}")
+    @GET
+    @Path("/{id}")
     @UnitOfWork
-	public Optional<Training> findById(@PathParam("id") LongParam id) {
-		return trainingFacade.findTrainingById(id.get());
-	}
-	
-	@POST
+    public Optional<Game> findById(@PathParam("id") LongParam id) {
+        return gameFacade.findGameById(id.get());
+    }
+    
+    @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @UnitOfWork
-    public Training add(@Valid Training training) {
-		return trainingFacade.createTraining(training);
-	}
-    
+    public Game add(@Auth User user, @Valid Game game) {
+    	return gameFacade.createGame(user, game);
+    }
+	
 }

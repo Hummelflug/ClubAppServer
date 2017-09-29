@@ -3,6 +3,7 @@ package de.hummelflug.clubapp.server.resources;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
@@ -22,15 +23,16 @@ import io.dropwizard.jersey.params.LongParam;
 @Path("/team_schedule")
 @RolesAllowed(UserRole.Constants.ADMIN_VALUE)
 @Produces(MediaType.APPLICATION_JSON)
-public class TeamScheduleRessource {
+public class TeamScheduleResource {
 
 	private TeamScheduleFacade teamScheduleFacade;
 	
-	public TeamScheduleRessource(TeamScheduleFacade teamScheduleFacade) {
+	public TeamScheduleResource(TeamScheduleFacade teamScheduleFacade) {
 		this.teamScheduleFacade = teamScheduleFacade;
 	}
 	
 	@GET
+	@Produces(MediaType.APPLICATION_JSON)
     @UnitOfWork
     public List<TeamSchedule> findAll() {
 		return teamScheduleFacade.findAllTeamSchedules();
@@ -38,6 +40,8 @@ public class TeamScheduleRessource {
 	
     @GET
     @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @PermitAll
     @UnitOfWork
     public Optional<TeamSchedule> findById(@PathParam("id") LongParam id) {
         return teamScheduleFacade.findTeamScheduleById(id.get());

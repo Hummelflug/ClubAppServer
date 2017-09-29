@@ -26,11 +26,11 @@ import io.dropwizard.jersey.params.LongParam;
 @Path("/coach")
 @RolesAllowed(UserRole.Constants.ADMIN_VALUE)
 @Produces(MediaType.APPLICATION_JSON)
-public class CoachRessource {
+public class CoachResource {
 
 	private CoachFacade coachFacade;
 	
-	public CoachRessource(CoachFacade coachFacade) {
+	public CoachResource(CoachFacade coachFacade) {
 		this.coachFacade = coachFacade;
 	}
 	

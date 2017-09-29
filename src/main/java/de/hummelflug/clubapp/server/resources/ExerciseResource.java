@@ -15,20 +15,22 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import de.hummelflug.clubapp.server.core.Exercise;
+import de.hummelflug.clubapp.server.core.User;
 import de.hummelflug.clubapp.server.facade.ExerciseFacade;
 import de.hummelflug.clubapp.server.utils.ExerciseType;
 import de.hummelflug.clubapp.server.utils.UserRole;
+import io.dropwizard.auth.Auth;
 import io.dropwizard.hibernate.UnitOfWork;
 import io.dropwizard.jersey.params.LongParam;
 
 @Path("/exercise")
 @RolesAllowed(UserRole.Constants.ADMIN_VALUE)
 @Produces(MediaType.APPLICATION_JSON)
-public class ExerciseRessource {
+public class ExerciseResource {
 
 	private ExerciseFacade exerciseFacade;
 	
-	public ExerciseRessource(ExerciseFacade exerciseFacade) {
+	public ExerciseResource(ExerciseFacade exerciseFacade) {
 		this.exerciseFacade = exerciseFacade;
 	}
 	
@@ -53,8 +55,8 @@ public class ExerciseRessource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @UnitOfWork
-    public Exercise add(@Valid Exercise exercise) {
-        return exerciseFacade.createExercise(exercise);
+    public Exercise add(@Auth User user, @Valid Exercise exercise) {
+        return exerciseFacade.createExercise(user, exercise);
     }
 	
 }

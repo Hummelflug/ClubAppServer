@@ -40,6 +40,7 @@ import de.hummelflug.clubapp.server.facade.ExerciseFacade;
 import de.hummelflug.clubapp.server.facade.GameFacade;
 import de.hummelflug.clubapp.server.facade.OrganizerFacade;
 import de.hummelflug.clubapp.server.facade.PlayerFacade;
+import de.hummelflug.clubapp.server.facade.ScheduleFacade;
 import de.hummelflug.clubapp.server.facade.SportTypeFacade;
 import de.hummelflug.clubapp.server.facade.TeamFacade;
 import de.hummelflug.clubapp.server.facade.TeamScheduleFacade;
@@ -47,21 +48,21 @@ import de.hummelflug.clubapp.server.facade.TournamentFacade;
 import de.hummelflug.clubapp.server.facade.TrainingFacade;
 import de.hummelflug.clubapp.server.facade.UserFacade;
 import de.hummelflug.clubapp.server.facade.UserScheduleFacade;
-import de.hummelflug.clubapp.server.resources.ClubRessource;
-import de.hummelflug.clubapp.server.resources.CoachRessource;
-import de.hummelflug.clubapp.server.resources.EventRessource;
-import de.hummelflug.clubapp.server.resources.ExerciseRessource;
-import de.hummelflug.clubapp.server.resources.GameRessource;
-import de.hummelflug.clubapp.server.resources.OrganizerRessource;
-import de.hummelflug.clubapp.server.resources.PlayerRessource;
-import de.hummelflug.clubapp.server.resources.ScheduleRessource;
-import de.hummelflug.clubapp.server.resources.SportTypeRessource;
-import de.hummelflug.clubapp.server.resources.TeamRessource;
-import de.hummelflug.clubapp.server.resources.TeamScheduleRessource;
-import de.hummelflug.clubapp.server.resources.TournamentRessource;
-import de.hummelflug.clubapp.server.resources.TrainingRessource;
-import de.hummelflug.clubapp.server.resources.UserRessource;
-import de.hummelflug.clubapp.server.resources.UserScheduleRessource;
+import de.hummelflug.clubapp.server.resources.ClubResource;
+import de.hummelflug.clubapp.server.resources.CoachResource;
+import de.hummelflug.clubapp.server.resources.EventResource;
+import de.hummelflug.clubapp.server.resources.ExerciseResource;
+import de.hummelflug.clubapp.server.resources.GameResource;
+import de.hummelflug.clubapp.server.resources.OrganizerResource;
+import de.hummelflug.clubapp.server.resources.PlayerResource;
+import de.hummelflug.clubapp.server.resources.ScheduleResource;
+import de.hummelflug.clubapp.server.resources.SportTypeResource;
+import de.hummelflug.clubapp.server.resources.TeamResource;
+import de.hummelflug.clubapp.server.resources.TeamScheduleResource;
+import de.hummelflug.clubapp.server.resources.TournamentResource;
+import de.hummelflug.clubapp.server.resources.TrainingResource;
+import de.hummelflug.clubapp.server.resources.UserResource;
+import de.hummelflug.clubapp.server.resources.UserScheduleResource;
 import io.dropwizard.Application;
 import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.AuthValueFactoryProvider;
@@ -148,17 +149,18 @@ public class ClubAppServerApplication extends Application<ClubAppServerConfigura
         final UserScheduleDAO userScheduleDAO = new UserScheduleDAO(hibernateBundle.getSessionFactory());
         
         final UserScheduleFacade userScheduleFacade = new UserScheduleFacade(userScheduleDAO);
-        final TeamScheduleFacade teamScheduleFacade = new TeamScheduleFacade(coachDAO, playerDAO, teamDAO, 
+        final TeamScheduleFacade teamScheduleFacade = new TeamScheduleFacade(coachDAO, playerDAO, teamDAO,
         		teamScheduleDAO, userScheduleFacade);
         
-        final ClubFacade clubFacade = new ClubFacade(clubDAO, coachDAO, playerDAO);
+        final ClubFacade clubFacade = new ClubFacade(clubDAO, coachDAO, playerDAO, userDAO);
         final CoachFacade coachFacade = new CoachFacade(clubDAO, coachDAO, teamDAO, userScheduleDAO);
         final ExerciseFacade exerciseFacade = new ExerciseFacade(exerciseDAO);
         final GameFacade gameFacade = new GameFacade(gameDAO, teamScheduleFacade);
         final OrganizerFacade organizerFacade = new OrganizerFacade(organizerDAO);
         final PlayerFacade playerFacade = new PlayerFacade(clubDAO, playerDAO, teamDAO, userScheduleDAO);
+        final ScheduleFacade scheduleFacade = new ScheduleFacade(eventDAO, scheduleDAO);
         final SportTypeFacade sportTypeFacade = new SportTypeFacade(sportTypeDAO);
-        final TeamFacade teamFacade = new TeamFacade(coachDAO, playerDAO, teamDAO, teamScheduleDAO);    
+        final TeamFacade teamFacade = new TeamFacade(coachDAO, playerDAO, teamDAO, teamScheduleDAO, userDAO);    
         final TournamentFacade tournamentFacade = new TournamentFacade(tournamentDAO);
         final TrainingFacade trainingFacade = new TrainingFacade(teamScheduleFacade, trainingDAO);
         final UserFacade userFacade = new UserFacade(userDAO);
@@ -176,21 +178,21 @@ public class ClubAppServerApplication extends Application<ClubAppServerConfigura
         environment.jersey().register(RolesAllowedDynamicFeature.class);
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
         
-        environment.jersey().register(new ClubRessource(clubFacade));
-        environment.jersey().register(new CoachRessource(coachFacade));
-        environment.jersey().register(new EventRessource(eventDAO));
-        environment.jersey().register(new ExerciseRessource(exerciseFacade));
-        environment.jersey().register(new GameRessource(gameFacade));
-        environment.jersey().register(new OrganizerRessource(organizerFacade));
-        environment.jersey().register(new PlayerRessource(playerFacade));
-        environment.jersey().register(new ScheduleRessource(scheduleDAO));
-        environment.jersey().register(new SportTypeRessource(sportTypeFacade));
-        environment.jersey().register(new TeamRessource(teamFacade));
-        environment.jersey().register(new TeamScheduleRessource(teamScheduleFacade));
-        environment.jersey().register(new TournamentRessource(tournamentFacade));
-        environment.jersey().register(new TrainingRessource(trainingFacade));
-        environment.jersey().register(new UserRessource(userFacade));
-        environment.jersey().register(new UserScheduleRessource(userScheduleFacade));
+        environment.jersey().register(new ClubResource(clubFacade));
+        environment.jersey().register(new CoachResource(coachFacade));
+        environment.jersey().register(new EventResource(eventDAO));
+        environment.jersey().register(new ExerciseResource(exerciseFacade));
+        environment.jersey().register(new GameResource(gameFacade));
+        environment.jersey().register(new OrganizerResource(organizerFacade));
+        environment.jersey().register(new PlayerResource(playerFacade));
+        environment.jersey().register(new ScheduleResource(scheduleFacade));
+        environment.jersey().register(new SportTypeResource(sportTypeFacade));
+        environment.jersey().register(new TeamResource(teamFacade));
+        environment.jersey().register(new TeamScheduleResource(teamScheduleFacade));
+        environment.jersey().register(new TournamentResource(tournamentFacade));
+        environment.jersey().register(new TrainingResource(trainingFacade));
+        environment.jersey().register(new UserResource(userFacade));
+        environment.jersey().register(new UserScheduleResource(userScheduleFacade));
 
     }
 

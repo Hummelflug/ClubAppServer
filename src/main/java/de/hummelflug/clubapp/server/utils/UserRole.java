@@ -3,6 +3,7 @@ package de.hummelflug.clubapp.server.utils;
 public enum UserRole {
 	
 	ADMIN(Constants.ADMIN_VALUE),
+	BOARD(Constants.BOARD_VALUE),
 	COACH(Constants.COACH_VALUE),
 	ORGANIZER(Constants.ORGANIZER_VALUE),
 	PLAYER(Constants.PLAYER_VALUE);
@@ -20,6 +21,7 @@ public enum UserRole {
 	
 	public static class Constants {
 		public static final String ADMIN_VALUE = "ADMIN";
+		public static final String BOARD_VALUE = "BOARD";
 		public static final String COACH_VALUE = "COACH";
 		public static final String ORGANIZER_VALUE = "ORGANIZER";
 		public static final String PLAYER_VALUE = "PLAYER";

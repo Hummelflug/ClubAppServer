@@ -13,42 +13,44 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import de.hummelflug.clubapp.server.core.SportType;
-import de.hummelflug.clubapp.server.facade.SportTypeFacade;
+import de.hummelflug.clubapp.server.core.Training;
+import de.hummelflug.clubapp.server.core.User;
+import de.hummelflug.clubapp.server.facade.TrainingFacade;
 import de.hummelflug.clubapp.server.utils.UserRole;
+import io.dropwizard.auth.Auth;
 import io.dropwizard.hibernate.UnitOfWork;
 import io.dropwizard.jersey.params.LongParam;
 
-@Path("/sport_type")
+@Path("/training")
 @RolesAllowed(UserRole.Constants.ADMIN_VALUE)
 @Produces(MediaType.APPLICATION_JSON)
-public class SportTypeRessource {
+public class TrainingResource {
 
-	private SportTypeFacade sportTypeFacade;
+	private TrainingFacade trainingFacade;
 	
-	public SportTypeRessource(SportTypeFacade sportTypeFacade) {
-		this.sportTypeFacade = sportTypeFacade;
+	public TrainingResource(TrainingFacade trainingFacade) {
+		this.trainingFacade = trainingFacade;
 	}
 	
 	@GET
     @UnitOfWork
-    public List<SportType> findAll() {
-        return sportTypeFacade.findAllSportTypes();
+    public List<Training> findAll() {
+		return trainingFacade.findAllTrainings();
 	}
 	
-    @GET
-    @Path("/{id}")
+	@GET
+	@Path("/{id}")
     @UnitOfWork
-    public Optional<SportType> findById(@PathParam("id") LongParam id) {
-        return sportTypeFacade.findSportTypeById(id.get());
-    }
-    
-    @POST
+	public Optional<Training> findById(@PathParam("id") LongParam id) {
+		return trainingFacade.findTrainingById(id.get());
+	}
+	
+	@POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @UnitOfWork
-    public SportType add(@Valid SportType sportType) {
-    	return sportTypeFacade.createSportType(sportType);
-    }
-	
+    public Training add(@Auth User user, @Valid Training training) {
+		return trainingFacade.createTraining(user, training);
+	}
+    
 }

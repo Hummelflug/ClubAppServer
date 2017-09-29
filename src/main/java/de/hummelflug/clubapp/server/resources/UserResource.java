@@ -20,11 +20,11 @@ import io.dropwizard.jersey.params.LongParam;
 @Path("/user")
 @RolesAllowed(UserRole.Constants.ADMIN_VALUE)
 @Produces(MediaType.APPLICATION_JSON)
-public class UserRessource {
+public class UserResource {
 	
 	private UserFacade userFacade;
 	
-	public UserRessource(UserFacade userFacade) {
+	public UserResource(UserFacade userFacade) {
 		this.userFacade = userFacade;
 	}
 	

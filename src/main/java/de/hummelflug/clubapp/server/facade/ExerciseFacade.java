@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import de.hummelflug.clubapp.server.core.Exercise;
+import de.hummelflug.clubapp.server.core.User;
 import de.hummelflug.clubapp.server.db.ExerciseDAO;
 import de.hummelflug.clubapp.server.utils.ExerciseType;
 
@@ -15,8 +16,8 @@ public class ExerciseFacade {
 		this.exerciseDAO = exerciseDAO;
 	}
 	
-	public Exercise createExercise(Exercise exercise) {
-		return this.exerciseDAO.insert(new Exercise(exercise.getExerciseType(), exercise.getDifficulty(), 
+	public Exercise createExercise(User user, Exercise exercise) {
+		return this.exerciseDAO.insert(new Exercise(user.getId(), exercise.getExerciseType(), exercise.getDifficulty(), 
         		exercise.getAgeClass(), exercise.getImage(), exercise.getTitle(), exercise.getDescription()));
 	}
 	

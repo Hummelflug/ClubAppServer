@@ -17,47 +17,47 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
-import de.hummelflug.clubapp.server.core.Player;
-import de.hummelflug.clubapp.server.facade.PlayerFacade;
+import de.hummelflug.clubapp.server.core.Organizer;
+import de.hummelflug.clubapp.server.facade.OrganizerFacade;
 import de.hummelflug.clubapp.server.utils.UserRole;
 import io.dropwizard.hibernate.UnitOfWork;
 import io.dropwizard.jersey.params.LongParam;
 
-@Path("/player")
+@Path("/organizer")
 @RolesAllowed(UserRole.Constants.ADMIN_VALUE)
 @Produces(MediaType.APPLICATION_JSON)
-public class PlayerRessource {
+public class OrganizerResource {
 
-	private PlayerFacade playerFacade;
+	private OrganizerFacade organizerFacade;
 	
-	public PlayerRessource(PlayerFacade playerFacade) {
-		this.playerFacade = playerFacade;
+	public OrganizerResource(OrganizerFacade organizerFacade) {
+		this.organizerFacade = organizerFacade;
 	}
 	
 	@GET
     @UnitOfWork
-    public List<Player> findByName(@QueryParam("name") Optional<String> name) {
+    public List<Organizer> findByName(@QueryParam("name") Optional<String> name) {
         if (name.isPresent()) {
-            return playerFacade.findPlayerByName(name.get());
+            return organizerFacade.findOrganizerByName(name.get());
         } else {
-            return playerFacade.findAllPlayers();
+            return organizerFacade.findAllOrganizers();
         }
 	}
 	
     @GET
     @Path("/{id}")
     @UnitOfWork
-    public Optional<Player> findById(@PathParam("id") LongParam id) {
-        return playerFacade.findPlayerById(id.get());
+    public Optional<Organizer> findById(@PathParam("id") LongParam id) {
+        return organizerFacade.findOrganizerById(id.get());
     }
     
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @UnitOfWork
-    public Player add(@Valid Player player) {
-        try {
-			return playerFacade.createPlayer(player);
+    public Organizer add(@Valid Organizer organizer) {
+		try {
+			return organizerFacade.createOrganizer(organizer);
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
 			throw new WebApplicationException(400);
 		}

@@ -14,46 +14,48 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import de.hummelflug.clubapp.server.core.Team;
-import de.hummelflug.clubapp.server.facade.TeamFacade;
+import de.hummelflug.clubapp.server.core.Tournament;
+import de.hummelflug.clubapp.server.core.User;
+import de.hummelflug.clubapp.server.facade.TournamentFacade;
 import de.hummelflug.clubapp.server.utils.UserRole;
+import io.dropwizard.auth.Auth;
 import io.dropwizard.hibernate.UnitOfWork;
 import io.dropwizard.jersey.params.LongParam;
 
-@Path("/team")
+@Path("/tournament")
 @RolesAllowed(UserRole.Constants.ADMIN_VALUE)
 @Produces(MediaType.APPLICATION_JSON)
-public class TeamRessource {
+public class TournamentResource {
 
-	private TeamFacade teamFacade;
+	private TournamentFacade tournamentFacade;
 	
-	public TeamRessource(TeamFacade teamFacade) {
-		this.teamFacade = teamFacade;
+	public TournamentResource(TournamentFacade tournamentFacade) {
+		this.tournamentFacade = tournamentFacade;
 	}
 	
 	@GET
     @UnitOfWork
-    public List<Team> findByName(@QueryParam("name") Optional<String> name) {
+    public List<Tournament> findByName(@QueryParam("name") Optional<String> name) {
         if (name.isPresent()) {
-            return teamFacade.findTeamByName(name.get());
+            return tournamentFacade.findTournamentByName(name.get());
         } else {
-            return teamFacade.findAllTeams();
+            return tournamentFacade.findAllTournaments();
         }
 	}
 	
     @GET
     @Path("/{id}")
     @UnitOfWork
-    public Optional<Team> findById(@PathParam("id") LongParam id) {
-        return teamFacade.findTeamById(id.get());
+    public Optional<Tournament> findById(@PathParam("id") LongParam id) {
+        return tournamentFacade.findTournamentById(id.get());
     }
-	
+    
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @UnitOfWork
-    public Team add(@Valid Team team) {
-        return teamFacade.createTeam(team);
+    public Tournament add(@Auth User user, @Valid Tournament tournament) {
+    	return tournamentFacade.createTournament(user, tournament);
     }
-    
+	
 }

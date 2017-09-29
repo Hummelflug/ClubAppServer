@@ -17,47 +17,47 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
-import de.hummelflug.clubapp.server.core.Organizer;
-import de.hummelflug.clubapp.server.facade.OrganizerFacade;
+import de.hummelflug.clubapp.server.core.Player;
+import de.hummelflug.clubapp.server.facade.PlayerFacade;
 import de.hummelflug.clubapp.server.utils.UserRole;
 import io.dropwizard.hibernate.UnitOfWork;
 import io.dropwizard.jersey.params.LongParam;
 
-@Path("/organizer")
+@Path("/player")
 @RolesAllowed(UserRole.Constants.ADMIN_VALUE)
 @Produces(MediaType.APPLICATION_JSON)
-public class OrganizerRessource {
+public class PlayerResource {
 
-	private OrganizerFacade organizerFacade;
+	private PlayerFacade playerFacade;
 	
-	public OrganizerRessource(OrganizerFacade organizerFacade) {
-		this.organizerFacade = organizerFacade;
+	public PlayerResource(PlayerFacade playerFacade) {
+		this.playerFacade = playerFacade;
 	}
 	
 	@GET
     @UnitOfWork
-    public List<Organizer> findByName(@QueryParam("name") Optional<String> name) {
+    public List<Player> findByName(@QueryParam("name") Optional<String> name) {
         if (name.isPresent()) {
-            return organizerFacade.findOrganizerByName(name.get());
+            return playerFacade.findPlayerByName(name.get());
         } else {
-            return organizerFacade.findAllOrganizers();
+            return playerFacade.findAllPlayers();
         }
 	}
 	
     @GET
     @Path("/{id}")
     @UnitOfWork
-    public Optional<Organizer> findById(@PathParam("id") LongParam id) {
-        return organizerFacade.findOrganizerById(id.get());
+    public Optional<Player> findById(@PathParam("id") LongParam id) {
+        return playerFacade.findPlayerById(id.get());
     }
     
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @UnitOfWork
-    public Organizer add(@Valid Organizer organizer) {
-		try {
-			return organizerFacade.createOrganizer(organizer);
+    public Player add(@Valid Player player) {
+        try {
+			return playerFacade.createPlayer(player);
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
 			throw new WebApplicationException(400);
 		}

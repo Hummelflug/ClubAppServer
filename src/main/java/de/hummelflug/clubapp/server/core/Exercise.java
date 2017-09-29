@@ -25,7 +25,10 @@ import de.hummelflug.clubapp.server.utils.ExerciseType;
     	query = "select e from Exercise e where e.exerciseType like :exerciseType")
 })
 public class Exercise extends AbstractModel {
-
+	
+	@Column(name = "creator_user_id", nullable = false)
+	private Long creatorUserId;
+	
 	@Column(name = "exercise_type", nullable = false)
 	@Enumerated(EnumType.STRING)
 	private ExerciseType exerciseType;
@@ -52,8 +55,19 @@ public class Exercise extends AbstractModel {
 	public Exercise() {
 	}
 	
-	public Exercise(@Nonnull ExerciseType exerciseType, Integer difficulty, Integer ageClass, byte[] image, 
-			String title, String description) {
+	/**
+	 * 
+	 * @param creatorUserId user id of creator
+	 * @param exerciseType type of exercise
+	 * @param difficulty of the exercise
+	 * @param ageClass recommended age class of the exercise
+	 * @param image of the exercise
+	 * @param title of the exercise
+	 * @param description of the exercise
+	 */
+	public Exercise(@Nonnull Long creatorUserId, @Nonnull ExerciseType exerciseType, Integer difficulty, 
+			Integer ageClass, byte[] image, String title, String description) {
+		this.creatorUserId = checkNotNull(creatorUserId, "creator user id cannot be null");
 		this.exerciseType = checkNotNull(exerciseType, "exercise type cannot be null");
 		this.difficulty = difficulty;
 		this.ageClass = ageClass;
@@ -70,6 +84,7 @@ public class Exercise extends AbstractModel {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + ((ageClass == null) ? 0 : ageClass.hashCode());
+		result = prime * result + ((creatorUserId == null) ? 0 : creatorUserId.hashCode());
 		result = prime * result + ((description == null) ? 0 : description.hashCode());
 		result = prime * result + ((difficulty == null) ? 0 : difficulty.hashCode());
 		result = prime * result + ((exerciseType == null) ? 0 : exerciseType.hashCode());
@@ -95,6 +110,11 @@ public class Exercise extends AbstractModel {
 				return false;
 		} else if (!ageClass.equals(other.ageClass))
 			return false;
+		if (creatorUserId == null) {
+			if (other.creatorUserId != null)
+				return false;
+		} else if (!creatorUserId.equals(other.creatorUserId))
+			return false;
 		if (description == null) {
 			if (other.description != null)
 				return false;
@@ -115,6 +135,20 @@ public class Exercise extends AbstractModel {
 		} else if (!title.equals(other.title))
 			return false;
 		return true;
+	}
+
+	/**
+	 * @return the creatorUserId
+	 */
+	public Long getCreatorUserId() {
+		return creatorUserId;
+	}
+
+	/**
+	 * @param creatorUserId the creatorUserId to set
+	 */
+	public void setCreatorUserId(Long creatorUserId) {
+		this.creatorUserId = creatorUserId;
 	}
 
 	/**

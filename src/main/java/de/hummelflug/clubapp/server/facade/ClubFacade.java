@@ -1,55 +1,164 @@
 package de.hummelflug.clubapp.server.facade;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.ws.rs.WebApplicationException;
+
 import de.hummelflug.clubapp.server.core.Club;
 import de.hummelflug.clubapp.server.core.Coach;
 import de.hummelflug.clubapp.server.core.Player;
+import de.hummelflug.clubapp.server.core.User;
 import de.hummelflug.clubapp.server.db.ClubDAO;
 import de.hummelflug.clubapp.server.db.CoachDAO;
 import de.hummelflug.clubapp.server.db.PlayerDAO;
+import de.hummelflug.clubapp.server.db.UserDAO;
+import de.hummelflug.clubapp.server.utils.UserRole;
 
 public class ClubFacade {
 
 	private final ClubDAO clubDAO;
 	private final CoachDAO coachDAO;
 	private final PlayerDAO playerDAO;
+	private final UserDAO userDAO;
 	
-	public ClubFacade(ClubDAO clubDAO, CoachDAO coachDAO, PlayerDAO playerDAO) {
+	public ClubFacade(ClubDAO clubDAO, CoachDAO coachDAO, PlayerDAO playerDAO, UserDAO userDAO) {
 		this.clubDAO = clubDAO;
 		this.coachDAO = coachDAO;
 		this.playerDAO = playerDAO;
+		this.userDAO = userDAO;
 	}
 	
-	public Club createClub(Club club) {
+	public Club addBoardToClub(User user, Long clubId, Long boardId) {
+		if (user != null && clubId != null && boardId != null) {
+			Optional<Club> clubOptional = findClubById(clubId);
+			if (clubOptional.isPresent() && user.getId() != null) {
+				Club club = clubOptional.get();
+				
+				if (club.getBoard().contains(user.getId()) || user.getUserRole().equals(UserRole.ADMIN)) {
+					addBoardToClubSet(club, boardId);
+					return clubDAO.update(club);
+				} else {
+					throw new WebApplicationException(401);
+				}
+			}
+		} 
+		
+		throw new WebApplicationException(400);
+	}
+	
+	private void addBoardToClubSet(Club club, Long boardId) {
+		Optional<User> userOptional = userDAO.findById(boardId);
+		if (userOptional.isPresent()) {
+			if (userOptional.get().getUserRole().equals(UserRole.BOARD)) {
+				club.getBoard().add(boardId);
+			} else {
+				throw new WebApplicationException(401);
+			}
+		} else {
+			throw new WebApplicationException(400);
+		}
+	}
+	
+	public Club addCoachToClub(User user, Long clubId, Long coachId) {
+		if (user != null && clubId != null && coachId != null) {
+			Optional<Club> clubOptional = findClubById(clubId);
+			if (clubOptional.isPresent() && user.getId() != null) {
+				Club club = clubOptional.get();
+				
+				if (club.getBoard().contains(user.getId()) || club.getCoaches().contains(user.getId()) 
+						|| user.getUserRole().equals(UserRole.ADMIN)) {
+					addCoachToClubSet(club, coachId);
+					return clubDAO.update(club);
+				} else {
+					throw new WebApplicationException(401);
+				}
+			}
+		} 
+		
+		throw new WebApplicationException(400);
+	}
+	
+	private void addCoachToClubSet(Club club, Long coachId) {
+		Optional<Coach> coachOptional = coachDAO.findById(coachId);
+		if (coachOptional.isPresent()) {
+			Coach coach = coachOptional.get();
+			
+			coach.getCurrentClubs().add(club.getId());
+			coach.getClubHistory().add(club.getId());
+		} else {
+			throw new WebApplicationException(400);
+		}
+	}
+	
+	public Club addPlayerToClub(User user, Long clubId, Long playerId) {
+		if (user != null && clubId != null && playerId != null) {
+			Optional<Club> clubOptional = findClubById(clubId);
+			if (clubOptional.isPresent() && user.getId() != null) {
+				Club club = clubOptional.get();
+				
+				if (club.getBoard().contains(user.getId()) || club.getCoaches().contains(user.getId()) 
+						|| user.getUserRole().equals(UserRole.ADMIN)) {
+					addPlayerToClubSet(club, playerId);
+					return clubDAO.update(club);
+				} else {
+					throw new WebApplicationException(401);
+				}
+			}
+		} 
+		
+		throw new WebApplicationException(400);
+	}
+	
+	private void addPlayerToClubSet(Club club, Long playerId) {
+		Optional<Player> playerOptional = playerDAO.findById(playerId);
+		if (playerOptional.isPresent()) {
+			Player player = playerOptional.get();
+			
+			player.getCurrentClubs().add(club.getId());
+			player.getClubHistory().add(club.getId());
+		} else {
+			throw new WebApplicationException(400);
+		}
+	}
+	
+	public Club createClub(Long userId, Club club) {
 		
 		/** Create club to get club id **/
-		Club newClub = clubDAO.insert(new Club(club.getName(), club.getFoundationDate()));
+		Club newClub = clubDAO.insert(new Club(userId, club.getName(), club.getFoundationDate()));
 		
 		/** Add provided sportTypes & teams **/
-		for (Long sportTypeId : club.getProvidedSportTypes()) {
-			newClub.getProvidedSportTypes().add(sportTypeId);
+		if (club.getProvidedSportTypes() != null) {
+			for (Long sportTypeId : club.getProvidedSportTypes()) {
+				newClub.getProvidedSportTypes().add(sportTypeId);
+			}
 		}
 		
-		for (Long teamId : club.getTeams()) {
-			newClub.getTeams().add(teamId);
+		if (club.getTeams() != null) {
+			for (Long teamId : club.getTeams()) {
+				newClub.getTeams().add(teamId);
+			}
 		}
-				
+		
+		/** Add board to team **/
+		if (club.getBoard() != null) {
+			Set<Long> boardIds = club.getBoard();
+			if (boardIds.size() == 0) {
+				addBoardToClubSet(newClub, userId);
+			} else {
+				for (Long boardId : boardIds) {
+					addBoardToClubSet(newClub, boardId);
+				}
+			}
+		}
+			
 		/** Change current clubs and history of coach **/
 		if (club.getPlayers() != null) {
 			Set<Long> coachIds = club.getCoaches();
 			for (Long coachId : coachIds) {
-				Optional<Coach> coachOptional = coachDAO.findById(coachId);
-				if (coachOptional.isPresent()) {
-					Coach coach = coachOptional.get();
-					
-					coach.getCurrentClubs().add(newClub.getId());
-					coach.getClubHistory().add(newClub.getId());
-				} else {
-					return null;
-				}
+				addCoachToClubSet(newClub, coachId);
 			}
 		}
 
@@ -57,15 +166,7 @@ public class ClubFacade {
 		if (club.getPlayers() != null) {
 			Set<Long> playerIds = club.getPlayers();
 			for (Long playerId : playerIds) {
-				Optional<Player> playerOptional = playerDAO.findById(playerId);
-				if (playerOptional.isPresent()) {
-					Player player = playerOptional.get();
-					
-					player.getCurrentClubs().add(newClub.getId());
-					player.getClubHistory().add(newClub.getId());
-				} else {
-					return null;
-				}
+				addPlayerToClubSet(newClub, playerId);
 			}
 		}
 		
@@ -87,4 +188,47 @@ public class ClubFacade {
 		return clubDAO.findByName(name);
 	}
 	
+	public List<User> findClubBoard(Long clubId) {
+		Optional<Club> clubOptional = findClubById(clubId);
+		if (clubOptional.isPresent()) {
+			return findClubUsers(clubOptional.get().getBoard());
+		} else {
+			throw new WebApplicationException(400);
+		}
+	}
+	
+	public List<User> findClubCoaches(Long clubId) {
+		Optional<Club> clubOptional = findClubById(clubId);
+		if (clubOptional.isPresent()) {
+			return findClubUsers(clubOptional.get().getCoaches());
+		} else {
+			throw new WebApplicationException(400);
+		}
+	}
+
+	public List<User> findClubPlayers(Long clubId) {
+		Optional<Club> clubOptional = findClubById(clubId);
+		if (clubOptional.isPresent()) {
+			return findClubUsers(clubOptional.get().getPlayers());
+		} else {
+			throw new WebApplicationException(400);
+		}
+	}
+	
+	private List<User> findClubUsers(Set<Long> userIds) {
+		if (userIds != null) {
+			List<User> users = new ArrayList<User>();
+			for (Long userId : userIds) {
+				Optional<User> userOptional = userDAO.findById(userId);
+				if (userOptional.isPresent()) {
+					users.add(userOptional.get());
+				} else {
+					throw new WebApplicationException(400);
+				}
+			}
+			return users;
+		} else {
+			throw new WebApplicationException(400);
+		}
+	}
 }
