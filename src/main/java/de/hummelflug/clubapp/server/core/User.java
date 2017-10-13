@@ -2,14 +2,20 @@ package de.hummelflug.clubapp.server.core;
 
 import java.security.Principal;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -57,21 +63,25 @@ public class User extends AbstractModel implements Principal {
 	@Enumerated(EnumType.STRING)
 	private GenderType gender;
 	
+	@ElementCollection (fetch = FetchType.EAGER, targetClass = UserRole.class)
+	@CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
 	@Column(name = "user_role", nullable = false)
 	@Enumerated(EnumType.STRING)
-	private UserRole userRole;
+	private Set<UserRole> userRoles;
 	
 	/**
 	 * A no-argument constructor
 	 */
 	public User() {
+		userRoles = new HashSet<UserRole>();
 	}
 	
 	/**
 	 * @param userRole user role
 	 */
 	public User(@Nonnull UserRole userRole) {
-		this.userRole = checkNotNull(userRole, "userRole cannot be null");
+		this.userRoles = new HashSet<UserRole>();
+		this.userRoles.add(checkNotNull(userRole, "userRole cannot be null"));
 	}
 	
 	/**
@@ -88,13 +98,24 @@ public class User extends AbstractModel implements Principal {
      */
 	public User(@Nonnull String lastName, @Nonnull String firstName, @Nonnull Date birthday, @Nonnull String email, 
 			@Nonnull String password, GenderType gender, @Nonnull UserRole userRole) {
+		this.userRoles = new HashSet<UserRole>();
+		this.userRoles.add(checkNotNull(userRole, "userRole cannot be null"));
+		
 		this.lastName = checkNotNull(lastName, "last name cannot be null");
 		this.firstName = checkNotNull(firstName, "first name cannot be null");
 		this.birthday = checkNotNull(birthday, "birthday cannot be null");
 		this.email = checkNotNull(email, "email cannot be null");
 		this.password = checkNotNull(password, "password cannot be null");
 		this.gender = gender;
-		this.userRole = checkNotNull(userRole, "userRole cannot be null");
+	}
+	
+	/**
+	 * DO NOT REMOVE THIS METHOD
+	 * method returns email as name for authentication
+	 * @return the email
+	 */
+	public String getName() {
+		return email;
 	}
 
 	/* (non-Javadoc)
@@ -103,17 +124,14 @@ public class User extends AbstractModel implements Principal {
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
+		int result = super.hashCode();
 		result = prime * result + ((birthday == null) ? 0 : birthday.hashCode());
-		result = prime * result + ((creationTime == null) ? 0 : creationTime.hashCode());
 		result = prime * result + ((email == null) ? 0 : email.hashCode());
 		result = prime * result + ((firstName == null) ? 0 : firstName.hashCode());
 		result = prime * result + ((gender == null) ? 0 : gender.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((lastModification == null) ? 0 : lastModification.hashCode());
 		result = prime * result + ((lastName == null) ? 0 : lastName.hashCode());
 		result = prime * result + ((password == null) ? 0 : password.hashCode());
-		result = prime * result + ((userRole == null) ? 0 : userRole.hashCode());
+		result = prime * result + ((userRoles == null) ? 0 : userRoles.hashCode());
 		return result;
 	}
 
@@ -124,7 +142,7 @@ public class User extends AbstractModel implements Principal {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
+		if (!super.equals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
@@ -133,11 +151,6 @@ public class User extends AbstractModel implements Principal {
 			if (other.birthday != null)
 				return false;
 		} else if (!birthday.equals(other.birthday))
-			return false;
-		if (creationTime == null) {
-			if (other.creationTime != null)
-				return false;
-		} else if (!creationTime.equals(other.creationTime))
 			return false;
 		if (email == null) {
 			if (other.email != null)
@@ -151,16 +164,6 @@ public class User extends AbstractModel implements Principal {
 			return false;
 		if (gender != other.gender)
 			return false;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (lastModification == null) {
-			if (other.lastModification != null)
-				return false;
-		} else if (!lastModification.equals(other.lastModification))
-			return false;
 		if (lastName == null) {
 			if (other.lastName != null)
 				return false;
@@ -171,51 +174,12 @@ public class User extends AbstractModel implements Principal {
 				return false;
 		} else if (!password.equals(other.password))
 			return false;
-		if (userRole != other.userRole)
+		if (userRoles == null) {
+			if (other.userRoles != null)
+				return false;
+		} else if (!userRoles.equals(other.userRoles))
 			return false;
 		return true;
-	}
-
-	/**
-	 * @return the id
-	 */
-	public Long getId() {
-		return id;
-	}
-
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	/**
-	 * @return the creationTime
-	 */
-	public Date getCreationTime() {
-		return creationTime;
-	}
-
-	/**
-	 * @param creationTime the creationTime to set
-	 */
-	public void setCreationTime(Date creationTime) {
-		this.creationTime = creationTime;
-	}
-
-	/**
-	 * @return the lastModification
-	 */
-	public Date getLastModification() {
-		return lastModification;
-	}
-
-	/**
-	 * @param lastModification the lastModification to set
-	 */
-	public void setLastModification(Date lastModification) {
-		this.lastModification = lastModification;
 	}
 
 	/**
@@ -303,25 +267,17 @@ public class User extends AbstractModel implements Principal {
 	}
 
 	/**
-	 * @return the userRole
+	 * @return the userRoles
 	 */
-	public UserRole getUserRole() {
-		return userRole;
+	public Set<UserRole> getUserRoles() {
+		return userRoles;
 	}
 
 	/**
-	 * @param userRole the userRole to set
+	 * @param userRoles the userRoles to set
 	 */
-	public void setUserRole(UserRole userRole) {
-		this.userRole = userRole;
-	}
-
-	/**
-	 * @return the name (necessary for Principal)
-	 */
-	@Override
-	public String getName() {
-		return email;
+	public void setUserRoles(Set<UserRole> userRoles) {
+		this.userRoles = userRoles;
 	}
 	
 }

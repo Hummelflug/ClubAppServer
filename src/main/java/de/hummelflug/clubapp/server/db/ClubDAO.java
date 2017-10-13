@@ -31,7 +31,7 @@ public class ClubDAO extends AbstractSuperDAO<Club> {
      * Looks for clubs whose name contains the passed parameter as a substring.
      * 
      * @param name query parameter
-     * @return list of clubs whose first or last name contains the passed
+     * @return list of clubs whose name contains the passed
      * parameter as a substring.
      */
 	public List<Club> findByName(String name) {

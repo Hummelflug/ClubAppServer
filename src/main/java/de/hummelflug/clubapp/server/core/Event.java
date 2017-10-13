@@ -1,14 +1,18 @@
 package de.hummelflug.clubapp.server.core;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -43,16 +47,41 @@ public class Event extends AbstractModel {
 	@Enumerated(EnumType.STRING)
 	private EventType eventType;
 	
+	@CollectionTable(name = "event_participants", joinColumns = @JoinColumn(name = "event_id"))
+	@Column(name = "user_id", nullable = false)
+	private Set<Long> participants;
+	
+	@CollectionTable(name = "event_confirmation", joinColumns = @JoinColumn(name = "event_id"))
+	@Column(name = "user_id", nullable = false)
+	private Set<Long> confirmedParticipants;
+	
+	@CollectionTable(name = "event_absence", joinColumns = @JoinColumn(name = "event_id"))
+	@Column(name = "user_id", nullable = false)
+	private Set<Long> absentUsers;
+	
+	@CollectionTable(name = "event_unknown_status", joinColumns = @JoinColumn(name = "event_id"))
+	@Column(name = "user_id", nullable = false)
+	private Set<Long> undecidedUsers;
+	
 	/**
 	 * A no-argument constructor
 	 */
 	public Event() {
+		participants = new HashSet<Long>();
+		confirmedParticipants = new HashSet<Long>();
+		absentUsers = new HashSet<Long>();
+		undecidedUsers = new HashSet<Long>();
 	}
 	
 	/**
 	 * @param eventType of event (game, training)
 	 */
 	public Event(@Nonnull EventType eventType) {
+		participants = new HashSet<Long>();
+		confirmedParticipants = new HashSet<Long>();
+		absentUsers = new HashSet<Long>();
+		undecidedUsers = new HashSet<Long>();
+		
 		this.eventType = checkNotNull(eventType, "event type cannot be null");
 	}
 	
@@ -67,6 +96,11 @@ public class Event extends AbstractModel {
 	 */
 	public Event(@Nonnull Long creatorUserId, @Nonnull EventType eventType, @Nonnull Date startTime,
 			@Nonnull Date endTime) {
+		participants = new HashSet<Long>();
+		confirmedParticipants = new HashSet<Long>();
+		absentUsers = new HashSet<Long>();
+		undecidedUsers = new HashSet<Long>();
+		
 		this.creatorUserId = checkNotNull(creatorUserId, "creator user id cannot be null");
 		this.eventType = checkNotNull(eventType, "event type cannot be null");
 		this.startTime = checkNotNull(startTime, "start time cannot be null");
@@ -80,10 +114,14 @@ public class Event extends AbstractModel {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
+		result = prime * result + ((absentUsers == null) ? 0 : absentUsers.hashCode());
+		result = prime * result + ((confirmedParticipants == null) ? 0 : confirmedParticipants.hashCode());
 		result = prime * result + ((creatorUserId == null) ? 0 : creatorUserId.hashCode());
 		result = prime * result + ((endTime == null) ? 0 : endTime.hashCode());
 		result = prime * result + ((eventType == null) ? 0 : eventType.hashCode());
+		result = prime * result + ((participants == null) ? 0 : participants.hashCode());
 		result = prime * result + ((startTime == null) ? 0 : startTime.hashCode());
+		result = prime * result + ((undecidedUsers == null) ? 0 : undecidedUsers.hashCode());
 		return result;
 	}
 
@@ -99,6 +137,16 @@ public class Event extends AbstractModel {
 		if (getClass() != obj.getClass())
 			return false;
 		Event other = (Event) obj;
+		if (absentUsers == null) {
+			if (other.absentUsers != null)
+				return false;
+		} else if (!absentUsers.equals(other.absentUsers))
+			return false;
+		if (confirmedParticipants == null) {
+			if (other.confirmedParticipants != null)
+				return false;
+		} else if (!confirmedParticipants.equals(other.confirmedParticipants))
+			return false;
 		if (creatorUserId == null) {
 			if (other.creatorUserId != null)
 				return false;
@@ -111,10 +159,20 @@ public class Event extends AbstractModel {
 			return false;
 		if (eventType != other.eventType)
 			return false;
+		if (participants == null) {
+			if (other.participants != null)
+				return false;
+		} else if (!participants.equals(other.participants))
+			return false;
 		if (startTime == null) {
 			if (other.startTime != null)
 				return false;
 		} else if (!startTime.equals(other.startTime))
+			return false;
+		if (undecidedUsers == null) {
+			if (other.undecidedUsers != null)
+				return false;
+		} else if (!undecidedUsers.equals(other.undecidedUsers))
 			return false;
 		return true;
 	}
@@ -173,6 +231,62 @@ public class Event extends AbstractModel {
 	 */
 	public void setEventType(EventType eventType) {
 		this.eventType = eventType;
+	}
+
+	/**
+	 * @return the participants
+	 */
+	public Set<Long> getParticipants() {
+		return participants;
+	}
+
+	/**
+	 * @param participants the participants to set
+	 */
+	public void setParticipants(Set<Long> participants) {
+		this.participants = participants;
+	}
+
+	/**
+	 * @return the confirmedParticipants
+	 */
+	public Set<Long> getConfirmedParticipants() {
+		return confirmedParticipants;
+	}
+
+	/**
+	 * @param confirmedParticipants the confirmedParticipants to set
+	 */
+	public void setConfirmedParticipants(Set<Long> confirmedParticipants) {
+		this.confirmedParticipants = confirmedParticipants;
+	}
+
+	/**
+	 * @return the absentUsers
+	 */
+	public Set<Long> getAbsentUsers() {
+		return absentUsers;
+	}
+
+	/**
+	 * @param absentUsers the absentUsers to set
+	 */
+	public void setAbsentUsers(Set<Long> absentUsers) {
+		this.absentUsers = absentUsers;
+	}
+
+	/**
+	 * @return the undecidedUsers
+	 */
+	public Set<Long> getUndecidedUsers() {
+		return undecidedUsers;
+	}
+
+	/**
+	 * @param undecidedUsers the undecidedUsers to set
+	 */
+	public void setUndecidedUsers(Set<Long> undecidedUsers) {
+		this.undecidedUsers = undecidedUsers;
 	}
 	
 }

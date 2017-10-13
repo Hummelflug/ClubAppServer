@@ -98,6 +98,24 @@ public class ClubResource {
         return clubFacade.addCoachToClub(user, clubId.get(), coachId.get());
     }
     
+    @Path("/{id}/departmentHead")
+    @Produces(MediaType.APPLICATION_JSON)
+    @PermitAll
+    @UnitOfWork
+    public List<User> findDepartmentHead(@PathParam("id") LongParam clubId) {
+        return clubFacade.findClubDepartmentHead(clubId.get());
+    }
+    
+    @POST
+    @Path("/{id}/departmentHead")
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({ UserRole.Constants.ADMIN_VALUE, UserRole.Constants.BOARD_VALUE })
+    @UnitOfWork
+    public Club addDepartmentHead(@Auth User user, @PathParam("id") LongParam clubId,
+    		@QueryParam("departmentHeadId") LongParam departmentHeadId) {
+        return clubFacade.addDepartmentHeadToClub(user, clubId.get(), departmentHeadId.get());
+    }
+    
     @GET
     @Path("/{id}/player")
     @Produces(MediaType.APPLICATION_JSON)

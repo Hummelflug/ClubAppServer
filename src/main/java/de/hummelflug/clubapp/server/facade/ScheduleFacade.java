@@ -34,7 +34,8 @@ public class ScheduleFacade {
 			
 			/** Check permission **/
 			if (schedule.getScheduleType().equals(ScheduleType.USER)) {
-				if (!(user.getUserRole() == UserRole.ADMIN || user.getId() == ((UserSchedule) schedule).getUserId())) {
+				if (!(user.getUserRoles().contains(UserRole.ADMIN) 
+						|| user.getId() == ((UserSchedule) schedule).getUserId())) {
 					throw new WebApplicationException(401);
 				}		
 			}

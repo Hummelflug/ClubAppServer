@@ -6,6 +6,7 @@ import de.hummelflug.clubapp.server.auth.UserAuthenticator;
 import de.hummelflug.clubapp.server.auth.UserAuthorizer;
 import de.hummelflug.clubapp.server.core.Club;
 import de.hummelflug.clubapp.server.core.Coach;
+import de.hummelflug.clubapp.server.core.Department;
 import de.hummelflug.clubapp.server.core.Event;
 import de.hummelflug.clubapp.server.core.Exercise;
 import de.hummelflug.clubapp.server.core.Game;
@@ -21,6 +22,7 @@ import de.hummelflug.clubapp.server.core.User;
 import de.hummelflug.clubapp.server.core.UserSchedule;
 import de.hummelflug.clubapp.server.db.ClubDAO;
 import de.hummelflug.clubapp.server.db.CoachDAO;
+import de.hummelflug.clubapp.server.db.DepartmentDAO;
 import de.hummelflug.clubapp.server.db.EventDAO;
 import de.hummelflug.clubapp.server.db.ExerciseDAO;
 import de.hummelflug.clubapp.server.db.GameDAO;
@@ -36,6 +38,8 @@ import de.hummelflug.clubapp.server.db.UserDAO;
 import de.hummelflug.clubapp.server.db.UserScheduleDAO;
 import de.hummelflug.clubapp.server.facade.ClubFacade;
 import de.hummelflug.clubapp.server.facade.CoachFacade;
+import de.hummelflug.clubapp.server.facade.DepartmentFacade;
+import de.hummelflug.clubapp.server.facade.EventFacade;
 import de.hummelflug.clubapp.server.facade.ExerciseFacade;
 import de.hummelflug.clubapp.server.facade.GameFacade;
 import de.hummelflug.clubapp.server.facade.OrganizerFacade;
@@ -50,6 +54,7 @@ import de.hummelflug.clubapp.server.facade.UserFacade;
 import de.hummelflug.clubapp.server.facade.UserScheduleFacade;
 import de.hummelflug.clubapp.server.resources.ClubResource;
 import de.hummelflug.clubapp.server.resources.CoachResource;
+import de.hummelflug.clubapp.server.resources.DepartmentResource;
 import de.hummelflug.clubapp.server.resources.EventResource;
 import de.hummelflug.clubapp.server.resources.ExerciseResource;
 import de.hummelflug.clubapp.server.resources.GameResource;
@@ -84,6 +89,7 @@ public class ClubAppServerApplication extends Application<ClubAppServerConfigura
             = new HibernateBundle<ClubAppServerConfiguration>(
             		Club.class,
             		Coach.class,
+            		Department.class,
             		Event.class,
             		Exercise.class,
             		Game.class,
@@ -134,6 +140,7 @@ public class ClubAppServerApplication extends Application<ClubAppServerConfigura
                     final Environment environment) {
     	final ClubDAO clubDAO = new ClubDAO(hibernateBundle.getSessionFactory());
     	final CoachDAO coachDAO = new CoachDAO(hibernateBundle.getSessionFactory());
+    	final DepartmentDAO departmentDAO = new DepartmentDAO(hibernateBundle.getSessionFactory());
     	final EventDAO eventDAO = new EventDAO(hibernateBundle.getSessionFactory());
     	final ExerciseDAO exerciseDAO = new ExerciseDAO(hibernateBundle.getSessionFactory());
     	final GameDAO gameDAO = new GameDAO(hibernateBundle.getSessionFactory());
@@ -154,13 +161,16 @@ public class ClubAppServerApplication extends Application<ClubAppServerConfigura
         
         final ClubFacade clubFacade = new ClubFacade(clubDAO, coachDAO, playerDAO, userDAO);
         final CoachFacade coachFacade = new CoachFacade(clubDAO, coachDAO, teamDAO, userScheduleDAO);
+        final DepartmentFacade departmentFacade = new DepartmentFacade(clubDAO, departmentDAO);
+        final EventFacade eventFacade = new EventFacade(eventDAO);
         final ExerciseFacade exerciseFacade = new ExerciseFacade(exerciseDAO);
         final GameFacade gameFacade = new GameFacade(gameDAO, teamScheduleFacade);
         final OrganizerFacade organizerFacade = new OrganizerFacade(organizerDAO);
         final PlayerFacade playerFacade = new PlayerFacade(clubDAO, playerDAO, teamDAO, userScheduleDAO);
         final ScheduleFacade scheduleFacade = new ScheduleFacade(eventDAO, scheduleDAO);
         final SportTypeFacade sportTypeFacade = new SportTypeFacade(sportTypeDAO);
-        final TeamFacade teamFacade = new TeamFacade(coachDAO, playerDAO, teamDAO, teamScheduleDAO, userDAO);    
+        final TeamFacade teamFacade = new TeamFacade(clubDAO, coachDAO, departmentDAO,
+        		playerDAO, teamDAO, teamScheduleDAO, userDAO);    
         final TournamentFacade tournamentFacade = new TournamentFacade(tournamentDAO);
         final TrainingFacade trainingFacade = new TrainingFacade(teamScheduleFacade, trainingDAO);
         final UserFacade userFacade = new UserFacade(userDAO);
@@ -180,7 +190,8 @@ public class ClubAppServerApplication extends Application<ClubAppServerConfigura
         
         environment.jersey().register(new ClubResource(clubFacade));
         environment.jersey().register(new CoachResource(coachFacade));
-        environment.jersey().register(new EventResource(eventDAO));
+        environment.jersey().register(new DepartmentResource(departmentFacade));
+        environment.jersey().register(new EventResource(eventFacade));
         environment.jersey().register(new ExerciseResource(exerciseFacade));
         environment.jersey().register(new GameResource(gameFacade));
         environment.jersey().register(new OrganizerResource(organizerFacade));

@@ -51,22 +51,22 @@ public class Coach extends User {
 	@ElementCollection
 	@CollectionTable(name = "coach_current_club", joinColumns = @JoinColumn(name = "coach_id"))
 	@Column(name = "club_id", nullable = false)
-	private Set<Long> currentClubs;
+	private Set<Long> currentClubsAsCoach;
 	
 	@ElementCollection
 	@CollectionTable(name = "coach_current_team", joinColumns = @JoinColumn(name = "coach_id"))
 	@Column(name = "team_id", nullable = false)
-	private Set<Long> currentTeams;
+	private Set<Long> currentTeamsAsCoach;
 	
 	@ElementCollection
 	@CollectionTable(name = "coach_club_history", joinColumns = @JoinColumn(name = "coach_id"))
 	@Column(name = "club_id", nullable = false)
-	private Set<Long> clubHistory;
+	private Set<Long> clubHistoryAsCoach;
 	
 	@ElementCollection
 	@CollectionTable(name = "coach_team_history", joinColumns = @JoinColumn(name = "coach_id"))
 	@Column(name = "team_id", nullable = false)
-	private Set<Long> teamHistory;
+	private Set<Long> teamHistoryAsCoach;
 	
 	@Column(table = "user_schedule", name = "schedule_id", nullable = false)
 	private Long scheduleId;
@@ -77,10 +77,10 @@ public class Coach extends User {
 	public Coach() {
 		super(UserRole.COACH);
 		
-		clubHistory = new HashSet<Long>();
-		currentClubs = new HashSet<Long>();
-		currentTeams = new HashSet<Long>();
-		teamHistory = new HashSet<Long>();
+		clubHistoryAsCoach = new HashSet<Long>();
+		currentClubsAsCoach = new HashSet<Long>();
+		currentTeamsAsCoach = new HashSet<Long>();
+		teamHistoryAsCoach = new HashSet<Long>();
 		sportTypes = new HashSet<Long>();
 	}
 	
@@ -99,10 +99,10 @@ public class Coach extends User {
 		
 		this.position = position;
 		
-		clubHistory = new HashSet<Long>();
-		currentClubs = new HashSet<Long>();
-		currentTeams = new HashSet<Long>();
-		teamHistory = new HashSet<Long>();
+		clubHistoryAsCoach = new HashSet<Long>();
+		currentClubsAsCoach = new HashSet<Long>();
+		currentTeamsAsCoach = new HashSet<Long>();
+		teamHistoryAsCoach = new HashSet<Long>();
 		sportTypes = new HashSet<Long>();
 	}
 
@@ -113,14 +113,14 @@ public class Coach extends User {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((clubHistory == null) ? 0 : clubHistory.hashCode());
-		result = prime * result + ((currentClubs == null) ? 0 : currentClubs.hashCode());
-		result = prime * result + ((currentTeams == null) ? 0 : currentTeams.hashCode());
+		result = prime * result + ((clubHistoryAsCoach == null) ? 0 : clubHistoryAsCoach.hashCode());
+		result = prime * result + ((currentClubsAsCoach == null) ? 0 : currentClubsAsCoach.hashCode());
+		result = prime * result + ((currentTeamsAsCoach == null) ? 0 : currentTeamsAsCoach.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((position == null) ? 0 : position.hashCode());
 		result = prime * result + ((scheduleId == null) ? 0 : scheduleId.hashCode());
 		result = prime * result + ((sportTypes == null) ? 0 : sportTypes.hashCode());
-		result = prime * result + ((teamHistory == null) ? 0 : teamHistory.hashCode());
+		result = prime * result + ((teamHistoryAsCoach == null) ? 0 : teamHistoryAsCoach.hashCode());
 		return result;
 	}
 
@@ -136,20 +136,20 @@ public class Coach extends User {
 		if (getClass() != obj.getClass())
 			return false;
 		Coach other = (Coach) obj;
-		if (clubHistory == null) {
-			if (other.clubHistory != null)
+		if (clubHistoryAsCoach == null) {
+			if (other.clubHistoryAsCoach != null)
 				return false;
-		} else if (!clubHistory.equals(other.clubHistory))
+		} else if (!clubHistoryAsCoach.equals(other.clubHistoryAsCoach))
 			return false;
-		if (currentClubs == null) {
-			if (other.currentClubs != null)
+		if (currentClubsAsCoach == null) {
+			if (other.currentClubsAsCoach != null)
 				return false;
-		} else if (!currentClubs.equals(other.currentClubs))
+		} else if (!currentClubsAsCoach.equals(other.currentClubsAsCoach))
 			return false;
-		if (currentTeams == null) {
-			if (other.currentTeams != null)
+		if (currentTeamsAsCoach == null) {
+			if (other.currentTeamsAsCoach != null)
 				return false;
-		} else if (!currentTeams.equals(other.currentTeams))
+		} else if (!currentTeamsAsCoach.equals(other.currentTeamsAsCoach))
 			return false;
 		if (id == null) {
 			if (other.id != null)
@@ -171,10 +171,10 @@ public class Coach extends User {
 				return false;
 		} else if (!sportTypes.equals(other.sportTypes))
 			return false;
-		if (teamHistory == null) {
-			if (other.teamHistory != null)
+		if (teamHistoryAsCoach == null) {
+			if (other.teamHistoryAsCoach != null)
 				return false;
-		} else if (!teamHistory.equals(other.teamHistory))
+		} else if (!teamHistoryAsCoach.equals(other.teamHistoryAsCoach))
 			return false;
 		return true;
 	}
@@ -222,59 +222,59 @@ public class Coach extends User {
 	}
 
 	/**
-	 * @return the currentClubs
+	 * @return the currentClubsAsCoach
 	 */
-	public Set<Long> getCurrentClubs() {
-		return currentClubs;
+	public Set<Long> getCurrentClubsAsCoach() {
+		return currentClubsAsCoach;
 	}
 
 	/**
-	 * @param currentClubs the currentClubs to set
+	 * @param currentClubsAsCoach the currentClubsAsCoach to set
 	 */
-	public void setCurrentClubs(Set<Long> currentClubs) {
-		this.currentClubs = currentClubs;
+	public void setCurrentClubsAsCoach(Set<Long> currentClubsAsCoach) {
+		this.currentClubsAsCoach = currentClubsAsCoach;
 	}
 
 	/**
-	 * @return the currentTeams
+	 * @return the currentTeamsAsCoach
 	 */
-	public Set<Long> getCurrentTeams() {
-		return currentTeams;
+	public Set<Long> getCurrentTeamsAsCoach() {
+		return currentTeamsAsCoach;
 	}
 
 	/**
-	 * @param currentTeams the currentTeams to set
+	 * @param currentTeamsAsCoach the currentTeamsAsCoach to set
 	 */
-	public void setCurrentTeams(Set<Long> currentTeams) {
-		this.currentTeams = currentTeams;
+	public void setCurrentTeamsAsCoach(Set<Long> currentTeamsAsCoach) {
+		this.currentTeamsAsCoach = currentTeamsAsCoach;
 	}
 
 	/**
-	 * @return the clubHistory
+	 * @return the clubHistoryAsCoach
 	 */
-	public Set<Long> getClubHistory() {
-		return clubHistory;
+	public Set<Long> getClubHistoryAsCoach() {
+		return clubHistoryAsCoach;
 	}
 
 	/**
-	 * @param clubHistory the clubHistory to set
+	 * @param clubHistoryAsCoach the clubHistoryAsCoach to set
 	 */
-	public void setClubHistory(Set<Long> clubHistory) {
-		this.clubHistory = clubHistory;
+	public void setClubHistoryAsCoach(Set<Long> clubHistoryAsCoach) {
+		this.clubHistoryAsCoach = clubHistoryAsCoach;
 	}
 
 	/**
-	 * @return the teamHistory
+	 * @return the teamHistoryAsCoach
 	 */
-	public Set<Long> getTeamHistory() {
-		return teamHistory;
+	public Set<Long> getTeamHistoryAsCoach() {
+		return teamHistoryAsCoach;
 	}
 
 	/**
-	 * @param teamHistory the teamHistory to set
+	 * @param teamHistoryAsCoach the teamHistoryAsCoach to set
 	 */
-	public void setTeamHistory(Set<Long> teamHistory) {
-		this.teamHistory = teamHistory;
+	public void setTeamHistoryAsCoach(Set<Long> teamHistoryAsCoach) {
+		this.teamHistoryAsCoach = teamHistoryAsCoach;
 	}
 
 	/**

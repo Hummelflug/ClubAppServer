@@ -37,7 +37,7 @@ public class ClubFacade {
 			if (clubOptional.isPresent() && user.getId() != null) {
 				Club club = clubOptional.get();
 				
-				if (club.getBoard().contains(user.getId()) || user.getUserRole().equals(UserRole.ADMIN)) {
+				if (club.getBoard().contains(user.getId()) || user.getUserRoles().contains(UserRole.ADMIN)) {
 					addBoardToClubSet(club, boardId);
 					return clubDAO.update(club);
 				} else {
@@ -52,7 +52,7 @@ public class ClubFacade {
 	private void addBoardToClubSet(Club club, Long boardId) {
 		Optional<User> userOptional = userDAO.findById(boardId);
 		if (userOptional.isPresent()) {
-			if (userOptional.get().getUserRole().equals(UserRole.BOARD)) {
+			if (userOptional.get().getUserRoles().contains(UserRole.BOARD)) {
 				club.getBoard().add(boardId);
 			} else {
 				throw new WebApplicationException(401);
@@ -69,7 +69,7 @@ public class ClubFacade {
 				Club club = clubOptional.get();
 				
 				if (club.getBoard().contains(user.getId()) || club.getCoaches().contains(user.getId()) 
-						|| user.getUserRole().equals(UserRole.ADMIN)) {
+						|| user.getUserRoles().contains(UserRole.ADMIN)) {
 					addCoachToClubSet(club, coachId);
 					return clubDAO.update(club);
 				} else {
@@ -86,8 +86,39 @@ public class ClubFacade {
 		if (coachOptional.isPresent()) {
 			Coach coach = coachOptional.get();
 			
-			coach.getCurrentClubs().add(club.getId());
-			coach.getClubHistory().add(club.getId());
+			coach.getCurrentClubsAsCoach().add(club.getId());
+			coach.getClubHistoryAsCoach().add(club.getId());
+		} else {
+			throw new WebApplicationException(400);
+		}
+	}
+	
+	public Club addDepartmentHeadToClub(User user, Long clubId, Long departmentHeadUserId) {
+		if (user != null && clubId != null && departmentHeadUserId != null) {
+			Optional<Club> clubOptional = findClubById(clubId);
+			if (clubOptional.isPresent() && user.getId() != null) {
+				Club club = clubOptional.get();
+				
+				if (club.getBoard().contains(user.getId()) || user.getUserRoles().contains(UserRole.ADMIN)) {
+					addDepartmentHeadToClubSet(club, departmentHeadUserId);
+					return clubDAO.update(club);
+				} else {
+					throw new WebApplicationException(401);
+				}
+			}
+		} 
+		
+		throw new WebApplicationException(400);
+	}
+	
+	private void addDepartmentHeadToClubSet(Club club, Long userId) {
+		Optional<User> userOptional = userDAO.findById(userId);
+		if (userOptional.isPresent()) {
+			if (userOptional.get().getUserRoles().contains(UserRole.DEP_HEAD)) {
+				club.getDepartmentHeadUsers().add(userId);
+			} else {
+				throw new WebApplicationException(401);
+			}
 		} else {
 			throw new WebApplicationException(400);
 		}
@@ -100,7 +131,7 @@ public class ClubFacade {
 				Club club = clubOptional.get();
 				
 				if (club.getBoard().contains(user.getId()) || club.getCoaches().contains(user.getId()) 
-						|| user.getUserRole().equals(UserRole.ADMIN)) {
+						|| user.getUserRoles().contains(UserRole.ADMIN)) {
 					addPlayerToClubSet(club, playerId);
 					return clubDAO.update(club);
 				} else {
@@ -117,8 +148,8 @@ public class ClubFacade {
 		if (playerOptional.isPresent()) {
 			Player player = playerOptional.get();
 			
-			player.getCurrentClubs().add(club.getId());
-			player.getClubHistory().add(club.getId());
+			player.getCurrentClubsAsPlayer().add(club.getId());
+			player.getClubHistoryAsPlayer().add(club.getId());
 		} else {
 			throw new WebApplicationException(400);
 		}
@@ -129,20 +160,35 @@ public class ClubFacade {
 		/** Create club to get club id **/
 		Club newClub = clubDAO.insert(new Club(userId, club.getName(), club.getFoundationDate()));
 		
-		/** Add provided sportTypes & teams **/
+		/** Add provided sportTypes **/
 		if (club.getProvidedSportTypes() != null) {
 			for (Long sportTypeId : club.getProvidedSportTypes()) {
 				newClub.getProvidedSportTypes().add(sportTypeId);
 			}
 		}
 		
+		/** Add departments to club **/
+		if (club.getDepartments() != null) {
+			for (Long departmentId : club.getDepartments()) {
+				newClub.getDepartments().add(departmentId);
+			}
+		}
+		
+		/** Add department head to club **/
+		if (club.getDepartmentHeadUsers() != null) {
+			for (Long depHeadId : club.getDepartmentHeadUsers()) {
+				newClub.getDepartmentHeadUsers().add(depHeadId);
+			}
+		}
+		
+		/** Add teams to club **/
 		if (club.getTeams() != null) {
 			for (Long teamId : club.getTeams()) {
 				newClub.getTeams().add(teamId);
 			}
 		}
 		
-		/** Add board to team **/
+		/** Add board to club **/
 		if (club.getBoard() != null) {
 			Set<Long> boardIds = club.getBoard();
 			if (boardIds.size() == 0) {
@@ -201,6 +247,15 @@ public class ClubFacade {
 		Optional<Club> clubOptional = findClubById(clubId);
 		if (clubOptional.isPresent()) {
 			return findClubUsers(clubOptional.get().getCoaches());
+		} else {
+			throw new WebApplicationException(400);
+		}
+	}
+	
+	public List<User> findClubDepartmentHead(Long clubId) {
+		Optional<Club> clubOptional = findClubById(clubId);
+		if (clubOptional.isPresent()) {
+			return findClubUsers(clubOptional.get().getDepartmentHeadUsers());
 		} else {
 			throw new WebApplicationException(400);
 		}

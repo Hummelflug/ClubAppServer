@@ -7,12 +7,16 @@ import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
 
+import de.hummelflug.clubapp.server.core.Club;
 import de.hummelflug.clubapp.server.core.Coach;
+import de.hummelflug.clubapp.server.core.Department;
 import de.hummelflug.clubapp.server.core.Player;
 import de.hummelflug.clubapp.server.core.Team;
 import de.hummelflug.clubapp.server.core.TeamSchedule;
 import de.hummelflug.clubapp.server.core.User;
+import de.hummelflug.clubapp.server.db.ClubDAO;
 import de.hummelflug.clubapp.server.db.CoachDAO;
+import de.hummelflug.clubapp.server.db.DepartmentDAO;
 import de.hummelflug.clubapp.server.db.PlayerDAO;
 import de.hummelflug.clubapp.server.db.TeamDAO;
 import de.hummelflug.clubapp.server.db.TeamScheduleDAO;
@@ -21,50 +25,23 @@ import de.hummelflug.clubapp.server.utils.UserRole;
 
 public class TeamFacade {
 	
+	private final ClubDAO clubDAO;
 	private final CoachDAO coachDAO;
+	private final DepartmentDAO departmentDAO;
 	private final PlayerDAO playerDAO;
 	private final TeamDAO teamDAO;
 	private final TeamScheduleDAO teamScheduleDAO;
 	private final UserDAO userDAO;
 
-	public TeamFacade(CoachDAO coachDAO, PlayerDAO playerDAO, TeamDAO teamDAO, TeamScheduleDAO teamScheduleDAO,
-			UserDAO userDAO) {
+	public TeamFacade(ClubDAO clubDAO, CoachDAO coachDAO, DepartmentDAO departmentDAO, PlayerDAO playerDAO,
+			TeamDAO teamDAO, TeamScheduleDAO teamScheduleDAO, UserDAO userDAO) {
+		this.clubDAO = clubDAO;
 		this.coachDAO = coachDAO;
+		this.departmentDAO = departmentDAO;
 		this.playerDAO = playerDAO;
 		this.teamDAO = teamDAO;
 		this.teamScheduleDAO = teamScheduleDAO;
 		this.userDAO = userDAO;
-	}
-	
-	public Team addBoardToTeam(User user, Long teamId, Long boardId) {
-		if (user != null && teamId != null && boardId != null) {
-			Optional<Team> teamOptional = findTeamById(teamId);
-			if (teamOptional.isPresent() && user.getId() != null) {
-				Team team = teamOptional.get();
-				
-				if (team.getBoard().contains(user.getId()) || user.getUserRole().equals(UserRole.ADMIN)) {
-					addBoardToTeamSet(team, boardId);
-					return teamDAO.update(team);
-				} else {
-					throw new WebApplicationException(401);
-				}
-			}
-		} 
-		
-		throw new WebApplicationException(400);
-	}
-	
-	private void addBoardToTeamSet(Team team, Long boardId) {
-		Optional<User> userOptional = userDAO.findById(boardId);
-		if (userOptional.isPresent()) {
-			if (userOptional.get().getUserRole().equals(UserRole.BOARD)) {
-				team.getBoard().add(boardId);
-			} else {
-				throw new WebApplicationException(401);
-			}
-		} else {
-			throw new WebApplicationException(400);
-		}
 	}
 	
 	public Team addCoachToTeam(User user, Long teamId, Long coachId) {
@@ -73,8 +50,7 @@ public class TeamFacade {
 			if (teamOptional.isPresent() && user.getId() != null) {
 				Team team = teamOptional.get();
 				
-				if (team.getBoard().contains(user.getId()) || team.getCoaches().contains(user.getId()) 
-						|| user.getUserRole().equals(UserRole.ADMIN)) {
+				if (team.getCoaches().contains(user.getId()) || user.getUserRoles().contains(UserRole.ADMIN)) {
 					addCoachToTeamSet(team, coachId);
 					return teamDAO.update(team);
 				} else {
@@ -91,8 +67,8 @@ public class TeamFacade {
 		if (coachOptional.isPresent()) {
 			Coach coach = coachOptional.get();
 			
-			coach.getCurrentTeams().add(team.getId());
-			coach.getTeamHistory().add(team.getId());
+			coach.getCurrentTeamsAsCoach().add(team.getId());
+			coach.getTeamHistoryAsCoach().add(team.getId());
 		} else {
 			throw new WebApplicationException(400);
 		}
@@ -104,8 +80,7 @@ public class TeamFacade {
 			if (teamOptional.isPresent() && user.getId() != null) {
 				Team team = teamOptional.get();
 				
-				if (team.getBoard().contains(user.getId()) || team.getCoaches().contains(user.getId()) 
-						|| user.getUserRole().equals(UserRole.ADMIN)) {
+				if (team.getCoaches().contains(user.getId()) || user.getUserRoles().contains(UserRole.ADMIN)) {
 					addPlayerToTeamSet(team, playerId);
 					return teamDAO.update(team);
 				} else {
@@ -121,29 +96,54 @@ public class TeamFacade {
 		if (playerOptional.isPresent()) {
 			Player player = playerOptional.get();
 			
-			player.getCurrentTeams().add(team.getId());
-			player.getTeamHistory().add(team.getId());
+			player.getCurrentTeamsAsPlayer().add(team.getId());
+			player.getTeamHistoryAsPlayer().add(team.getId());
 		} else {
 			throw new WebApplicationException(400);
 		}
 	}
 	
-	public Team createTeam(Long userId, Team team) {
+	public Team createTeam(User user, Team team) {
 		
 		/** Create team to get the team id **/
-		Team newTeam = teamDAO.insert(new Team(userId, team.getName(), team.getGender(), team.getAgeClass(),
+		Team newTeam = teamDAO.insert(new Team(user.getId(), team.getName(), team.getGender(), team.getAgeClass(),
 				team.getSportTypeId()));
 		
-		/** Add board to team **/
-		if (team.getBoard() != null) {
-			Set<Long> boardIds = team.getBoard();
-			if (boardIds.size() == 0) {
-				addBoardToTeamSet(newTeam, userId);
+		/** Add department id **/
+		Department department = null;
+		if (team.getDepartmentId() != null) {
+			Optional<Department> departmentOptional = departmentDAO.findById(team.getDepartmentId());
+			if (departmentOptional.isPresent()) {
+				department = departmentOptional.get();
+				if (department.getHead().contains(user.getId()) || user.getUserRoles().contains(UserRole.ADMIN)) {
+					department.getTeams().add(newTeam.getId());
+				} else {
+					throw new WebApplicationException(401);
+				}
 			} else {
-				for (Long boardId : boardIds) {
-					addBoardToTeamSet(newTeam, boardId);
+				throw new WebApplicationException(400);
+			}
+		} else {
+			throw new WebApplicationException(400);
+		}
+		
+		/** Add club id **/
+		if (team.getClubId() != null) {
+			Optional<Club> clubOptional = clubDAO.findById(team.getClubId());
+			if (clubOptional.isPresent()) {
+				Club club = clubOptional.get();
+				if (club.getBoard().contains(user.getId()) || department.getHead().contains(user.getId()) 
+						|| user.getUserRoles().contains(UserRole.ADMIN)) {
+					club.getTeams().add(newTeam.getId());
+				} else {
+					throw new WebApplicationException(401);
 				}
 			}
+			else {
+				throw new WebApplicationException(400);
+			}
+		} else {
+			throw new WebApplicationException(400);
 		}
 		
 		/** Change current teams and history of coach **/
@@ -184,15 +184,6 @@ public class TeamFacade {
 	
 	public List<Team> findTeamByName(String name) {
 		return teamDAO.findByName(name);
-	}
-	
-	public List<User> findTeamBoard(Long teamId) {
-		Optional<Team> teamOptional = findTeamById(teamId);
-		if (teamOptional.isPresent()) {
-			return findTeamUsers(teamOptional.get().getBoard());
-		} else {
-			throw new WebApplicationException(400);
-		}
 	}
 	
 	public List<User> findTeamCoaches(Long teamId) {

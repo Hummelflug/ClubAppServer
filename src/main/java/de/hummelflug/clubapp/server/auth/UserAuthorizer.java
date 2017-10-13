@@ -10,10 +10,10 @@ public class UserAuthorizer implements Authorizer<User> {
 	@Override
 	@UnitOfWork
 	public boolean authorize(User user, String role) {
-		if (user.getUserRole() == null) {
+		if (user.getUserRoles() == null) {
 			return false;
 		}
-		return user.getUserRole().equals(UserRole.valueOf(role));
+		return user.getUserRoles().contains(UserRole.valueOf(role));
 	}
 
 }

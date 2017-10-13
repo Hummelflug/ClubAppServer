@@ -38,12 +38,12 @@ public class PlayerFacade {
 				player.getPosition(), player.getShirtNumber()));
 		
 		/** Add team/club histories & sportTypes **/
-		for (Long clubId : player.getClubHistory()) {
-			newPlayer.getClubHistory().add(clubId);
+		for (Long clubId : player.getClubHistoryAsPlayer()) {
+			newPlayer.getClubHistoryAsPlayer().add(clubId);
 		}
 		
-		for (Long teamId : player.getTeamHistory()) {
-			newPlayer.getTeamHistory().add(teamId);
+		for (Long teamId : player.getTeamHistoryAsPlayer()) {
+			newPlayer.getTeamHistoryAsPlayer().add(teamId);
 		}
 		
 		for (Long sportTypeId : player.getSportTypes()) {
@@ -51,8 +51,8 @@ public class PlayerFacade {
 		}
 		
 		/** Add player to teams and clubs if necessary **/
-		if (player.getCurrentClubs() != null) {
-			Set<Long> clubIds = player.getCurrentClubs();
+		if (player.getCurrentClubsAsPlayer() != null) {
+			Set<Long> clubIds = player.getCurrentClubsAsPlayer();
 			for (Long clubId : clubIds) {
 				Optional<Club> clubOptional = clubDAO.findById(clubId);
 				if (clubOptional.isPresent()) {
@@ -64,8 +64,8 @@ public class PlayerFacade {
 			}
 		}
 		
-		if (player.getCurrentTeams() != null) {
-			Set<Long> teamIds = player.getCurrentTeams();
+		if (player.getCurrentTeamsAsPlayer() != null) {
+			Set<Long> teamIds = player.getCurrentTeamsAsPlayer();
 			for (Long teamId : teamIds) {
 				Optional<Team> teamOptional = teamDAO.findById(teamId);
 				if (teamOptional.isPresent()) {

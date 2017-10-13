@@ -58,8 +58,7 @@ public class TeamScheduleFacade {
 		Optional<Team> teamOptional = teamDAO.findById(teamId);
 		if (teamOptional.isPresent() && eventId != null) {
 			Team team = teamOptional.get();
-			if (team.getCoaches().contains(user.getId()) || team.getBoard().contains(user.getId()) 
-					|| user.getUserRole().equals(UserRole.ADMIN)) {
+			if (team.getCoaches().contains(user.getId()) || user.getUserRoles().contains(UserRole.ADMIN)) {
 				return addEventsByScheduleId(user, team.getTeamScheduleId(), eventId);
 			} else {
 				throw new WebApplicationException(401);
@@ -80,8 +79,8 @@ public class TeamScheduleFacade {
 				
 				Team team = teamOptional.get();
 				
-				if (team.getCoaches().contains(user.getId()) || user.getUserRole().equals(UserRole.ADMIN) 
-						|| user.getUserRole().equals(UserRole.ORGANIZER)) {
+				if (team.getCoaches().contains(user.getId()) || user.getUserRoles().contains(UserRole.ADMIN) 
+						|| user.getUserRoles().contains(UserRole.ORGANIZER)) {
 					addEventsToReferencedSchedules(teamSchedule, team,
 							new HashSet<Long>(Arrays.asList(new Long[] { eventId })));
 					

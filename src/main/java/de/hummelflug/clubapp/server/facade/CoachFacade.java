@@ -38,12 +38,12 @@ public class CoachFacade {
 				coach.getGender(), coach.getPosition()));
 		
 		/** Add team/club histories & sportTypes **/
-		for (Long clubId : coach.getClubHistory()) {
-			newCoach.getClubHistory().add(clubId);
+		for (Long clubId : coach.getClubHistoryAsCoach()) {
+			newCoach.getClubHistoryAsCoach().add(clubId);
 		}
 		
-		for (Long teamId : coach.getTeamHistory()) {
-			newCoach.getTeamHistory().add(teamId);
+		for (Long teamId : coach.getTeamHistoryAsCoach()) {
+			newCoach.getTeamHistoryAsCoach().add(teamId);
 		}
 		
 		for (Long sportTypeId : coach.getSportTypes()) {
@@ -53,8 +53,8 @@ public class CoachFacade {
 		coachDAO.update(newCoach);
 		
 		/** Add coach to teams and clubs if necessary **/
-		if (coach.getCurrentClubs() != null) {
-			Set<Long> clubIds = coach.getCurrentClubs();
+		if (coach.getCurrentClubsAsCoach() != null) {
+			Set<Long> clubIds = coach.getCurrentClubsAsCoach();
 			for (Long clubId : clubIds) {
 				Optional<Club> clubOptional = clubDAO.findById(clubId);
 				if (clubOptional.isPresent()) {
@@ -66,8 +66,8 @@ public class CoachFacade {
 			}
 		}
 		
-		if (coach.getCurrentTeams() != null) {
-			Set<Long> teamIds = coach.getCurrentTeams();
+		if (coach.getCurrentTeamsAsCoach() != null) {
+			Set<Long> teamIds = coach.getCurrentTeamsAsCoach();
 			for (Long teamId : teamIds) {
 				Optional<Team> teamOptional = teamDAO.findById(teamId);
 				if (teamOptional.isPresent()) {

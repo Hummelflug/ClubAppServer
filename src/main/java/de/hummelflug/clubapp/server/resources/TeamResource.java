@@ -40,7 +40,7 @@ public class TeamResource {
     @RolesAllowed({ UserRole.Constants.ADMIN_VALUE, UserRole.Constants.BOARD_VALUE })
     @UnitOfWork
     public Team add(@Auth User user, @Valid Team team) {
-        return teamFacade.createTeam(user.getId(), team);
+        return teamFacade.createTeam(user, team);
     }
 	
 	@GET
@@ -60,25 +60,6 @@ public class TeamResource {
     @UnitOfWork
     public Optional<Team> findById(@PathParam("id") LongParam id) {
         return teamFacade.findTeamById(id.get());
-    }
-    
-    @GET
-    @Path("/{id}/board")
-    @Produces(MediaType.APPLICATION_JSON)
-    @PermitAll
-    @UnitOfWork
-    public List<User> findBoard(@PathParam("id") LongParam teamId) {
-        return teamFacade.findTeamBoard(teamId.get());
-    }
-    
-    @POST
-    @Path("/{id}/board")
-    @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed({ UserRole.Constants.ADMIN_VALUE, UserRole.Constants.BOARD_VALUE })
-    @UnitOfWork
-    public Team addBoard(@Auth User user, @PathParam("id") LongParam teamId,
-    		@QueryParam("boardId") LongParam boardId) {
-        return teamFacade.addBoardToTeam(user, teamId.get(), boardId.get());
     }
     
     @GET

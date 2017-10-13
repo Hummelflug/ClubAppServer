@@ -45,6 +45,16 @@ public class Club extends AbstractModel {
 	private Set<Long> board;
 	
 	@ElementCollection
+	@CollectionTable(name = "club_department", joinColumns = @JoinColumn(name = "club_id"))
+	@Column(name = "department_id", nullable = false)
+	private Set<Long> departments;
+	
+	@ElementCollection
+	@CollectionTable(name = "club_dep_head", joinColumns = @JoinColumn(name = "club_id"))
+	@Column(name = "dep_head_user_id", nullable = false)
+	private Set<Long> departmentHeadUsers;
+	
+	@ElementCollection
 	@CollectionTable(name = "club_team", joinColumns = @JoinColumn(name = "club_id"))
 	@Column(name = "team_id", nullable = false)
 	private Set<Long> teams;
@@ -70,6 +80,8 @@ public class Club extends AbstractModel {
 	public Club() {
 		board = new HashSet<Long>();
 		coaches = new HashSet<Long>();
+		departments = new HashSet<Long>();
+		departmentHeadUsers = new HashSet<Long>();
 		players = new HashSet<Long>();
 		providedSportTypes = new HashSet<Long>();	
 		teams = new HashSet<Long>();
@@ -84,8 +96,12 @@ public class Club extends AbstractModel {
      * @param foundationDate date of club foundation
      */
 	public Club(@Nonnull Long creatorUserId, @Nonnull String name, Date foundationDate) {
-		providedSportTypes = new HashSet<Long>();
 		board = new HashSet<Long>();
+		coaches = new HashSet<Long>();
+		departments = new HashSet<Long>();
+		departmentHeadUsers = new HashSet<Long>();
+		players = new HashSet<Long>();
+		providedSportTypes = new HashSet<Long>();	
 		teams = new HashSet<Long>();
 		
 		this.creatorUserId = checkNotNull(creatorUserId, "creator user id cannot be null");
@@ -103,6 +119,8 @@ public class Club extends AbstractModel {
 		result = prime * result + ((board == null) ? 0 : board.hashCode());
 		result = prime * result + ((coaches == null) ? 0 : coaches.hashCode());
 		result = prime * result + ((creatorUserId == null) ? 0 : creatorUserId.hashCode());
+		result = prime * result + ((departmentHeadUsers == null) ? 0 : departmentHeadUsers.hashCode());
+		result = prime * result + ((departments == null) ? 0 : departments.hashCode());
 		result = prime * result + ((foundationDate == null) ? 0 : foundationDate.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((players == null) ? 0 : players.hashCode());
@@ -137,6 +155,16 @@ public class Club extends AbstractModel {
 			if (other.creatorUserId != null)
 				return false;
 		} else if (!creatorUserId.equals(other.creatorUserId))
+			return false;
+		if (departmentHeadUsers == null) {
+			if (other.departmentHeadUsers != null)
+				return false;
+		} else if (!departmentHeadUsers.equals(other.departmentHeadUsers))
+			return false;
+		if (departments == null) {
+			if (other.departments != null)
+				return false;
+		} else if (!departments.equals(other.departments))
 			return false;
 		if (foundationDate == null) {
 			if (other.foundationDate != null)
@@ -220,6 +248,34 @@ public class Club extends AbstractModel {
 	 */
 	public void setBoard(Set<Long> board) {
 		this.board = board;
+	}
+
+	/**
+	 * @return the departments
+	 */
+	public Set<Long> getDepartments() {
+		return departments;
+	}
+
+	/**
+	 * @param departments the departments to set
+	 */
+	public void setDepartments(Set<Long> departments) {
+		this.departments = departments;
+	}
+
+	/**
+	 * @return the departmentHeadUsers
+	 */
+	public Set<Long> getDepartmentHeadUsers() {
+		return departmentHeadUsers;
+	}
+
+	/**
+	 * @param departmentHeadUsers the departmentHeadUsers to set
+	 */
+	public void setDepartmentHeadUsers(Set<Long> departmentHeadUsers) {
+		this.departmentHeadUsers = departmentHeadUsers;
 	}
 
 	/**

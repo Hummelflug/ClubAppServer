@@ -15,6 +15,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SecondaryTable;
+import javax.persistence.SecondaryTables;
 import javax.persistence.Table;
 
 import de.hummelflug.clubapp.server.utils.GenderType;
@@ -23,8 +24,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 @Entity
 @Table(name = "team")
-@SecondaryTable(name = "team_schedule",
-		pkJoinColumns=@PrimaryKeyJoinColumn(name="team_id", referencedColumnName="id"))
+@SecondaryTables({
+	@SecondaryTable(name = "club_team",
+			pkJoinColumns=@PrimaryKeyJoinColumn(name="team_id", referencedColumnName="id")),
+	@SecondaryTable(name = "department_team",
+			pkJoinColumns=@PrimaryKeyJoinColumn(name="team_id", referencedColumnName="id")),
+	@SecondaryTable(name = "team_schedule",
+			pkJoinColumns=@PrimaryKeyJoinColumn(name="team_id", referencedColumnName="id"))
+})
 @NamedQueries({
     @NamedQuery(name = "de.hummelflug.clubapp.server.core.Team.findAll",
             query = "select t from Team t"),
@@ -36,6 +43,12 @@ public class Team extends AbstractModel {
 	
 	@Column(name = "creator_user_id", nullable = false)
 	private Long creatorUserId;
+	
+	@Column(table = "club_team", name = "club_id", nullable = false)
+	private Long clubId;
+	
+	@Column(table = "department_team", name = "department_id", nullable = false)
+	private Long departmentId;
 	
 	@Column(name = "name", nullable = false)
 	private String name;
@@ -49,11 +62,6 @@ public class Team extends AbstractModel {
 	
 	@Column(name = "sport_type_id", nullable = false)
 	private Long sportTypeId;
-	
-	@ElementCollection
-	@CollectionTable(name = "team_board", joinColumns = @JoinColumn(name = "team_id"))
-	@Column(name = "board_user_id", nullable = false)
-	private Set<Long> board;
 	
 	@ElementCollection
 	@CollectionTable(name = "coach_current_team", joinColumns = @JoinColumn(name = "team_id"))
@@ -72,7 +80,6 @@ public class Team extends AbstractModel {
 	 * A no-argument constructor
 	 */
 	public Team() {
-		board = new HashSet<Long>();
 		coaches = new HashSet<Long>();
 		players = new HashSet<Long>();
 	}
@@ -89,7 +96,6 @@ public class Team extends AbstractModel {
      */
 	public Team(@Nonnull Long creatorUserId, @Nonnull String name, GenderType gender, @Nonnull Integer ageClass,
 			@Nonnull Long sportTypeId) {
-		board = new HashSet<Long>();
 		coaches = new HashSet<Long>();
 		players = new HashSet<Long>();
 		
@@ -108,9 +114,10 @@ public class Team extends AbstractModel {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + ((ageClass == null) ? 0 : ageClass.hashCode());
-		result = prime * result + ((board == null) ? 0 : board.hashCode());
+		result = prime * result + ((clubId == null) ? 0 : clubId.hashCode());
 		result = prime * result + ((coaches == null) ? 0 : coaches.hashCode());
 		result = prime * result + ((creatorUserId == null) ? 0 : creatorUserId.hashCode());
+		result = prime * result + ((departmentId == null) ? 0 : departmentId.hashCode());
 		result = prime * result + ((gender == null) ? 0 : gender.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((players == null) ? 0 : players.hashCode());
@@ -136,10 +143,10 @@ public class Team extends AbstractModel {
 				return false;
 		} else if (!ageClass.equals(other.ageClass))
 			return false;
-		if (board == null) {
-			if (other.board != null)
+		if (clubId == null) {
+			if (other.clubId != null)
 				return false;
-		} else if (!board.equals(other.board))
+		} else if (!clubId.equals(other.clubId))
 			return false;
 		if (coaches == null) {
 			if (other.coaches != null)
@@ -150,6 +157,11 @@ public class Team extends AbstractModel {
 			if (other.creatorUserId != null)
 				return false;
 		} else if (!creatorUserId.equals(other.creatorUserId))
+			return false;
+		if (departmentId == null) {
+			if (other.departmentId != null)
+				return false;
+		} else if (!departmentId.equals(other.departmentId))
 			return false;
 		if (gender != other.gender)
 			return false;
@@ -188,6 +200,34 @@ public class Team extends AbstractModel {
 	 */
 	public void setCreatorUserId(Long creatorUserId) {
 		this.creatorUserId = creatorUserId;
+	}
+
+	/**
+	 * @return the clubId
+	 */
+	public Long getClubId() {
+		return clubId;
+	}
+
+	/**
+	 * @param clubId the clubId to set
+	 */
+	public void setClubId(Long clubId) {
+		this.clubId = clubId;
+	}
+
+	/**
+	 * @return the departmentId
+	 */
+	public Long getDepartmentId() {
+		return departmentId;
+	}
+
+	/**
+	 * @param departmentId the departmentId to set
+	 */
+	public void setDepartmentId(Long departmentId) {
+		this.departmentId = departmentId;
 	}
 
 	/**
@@ -244,20 +284,6 @@ public class Team extends AbstractModel {
 	 */
 	public void setSportTypeId(Long sportTypeId) {
 		this.sportTypeId = sportTypeId;
-	}
-
-	/**
-	 * @return the board
-	 */
-	public Set<Long> getBoard() {
-		return board;
-	}
-
-	/**
-	 * @param board the board to set
-	 */
-	public void setBoard(Set<Long> board) {
-		this.board = board;
 	}
 
 	/**

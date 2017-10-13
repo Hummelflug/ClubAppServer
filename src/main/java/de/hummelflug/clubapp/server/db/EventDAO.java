@@ -1,14 +1,15 @@
 package de.hummelflug.clubapp.server.db;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.SessionFactory;
 
 import de.hummelflug.clubapp.server.core.Event;
-import io.dropwizard.hibernate.AbstractDAO;
 
-public class EventDAO extends AbstractDAO<Event> {
+public class EventDAO extends AbstractSuperDAO<Event> {
 
 	/**
      * Constructor.
@@ -37,6 +38,27 @@ public class EventDAO extends AbstractDAO<Event> {
      */
 	public Optional<Event> findById(Long id) {
 		return Optional.ofNullable(get(id));
+	}
+	
+	/**
+     * Method returns all events whose id is element of passed parameter.
+     * 
+     * @return list of all events whose id is element of passed parameter
+     */
+	public List<Event> findByIds(Set<Long> ids) {
+		if (ids != null) {
+			List<Event> events = new ArrayList<Event>();
+			for (Long id : ids) {
+				Optional<Event> eventOptional = findById(id);
+				if (eventOptional.isPresent()) {
+					events.add(eventOptional.get());
+				} else {
+					return null;
+				}
+			}
+			return events;
+		}
+		return null;
 	}
 
 }
