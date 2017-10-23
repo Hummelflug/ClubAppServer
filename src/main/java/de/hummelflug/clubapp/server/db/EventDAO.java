@@ -43,6 +43,7 @@ public class EventDAO extends AbstractSuperDAO<Event> {
 	/**
      * Method returns all events whose id is element of passed parameter.
      * 
+     * @param ids set of ids whose events should be returned
      * @return list of all events whose id is element of passed parameter
      */
 	public List<Event> findByIds(Set<Long> ids) {

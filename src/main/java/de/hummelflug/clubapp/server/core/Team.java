@@ -64,6 +64,11 @@ public class Team extends AbstractModel {
 	private Long sportTypeId;
 	
 	@ElementCollection
+	@CollectionTable(name = "team_member", joinColumns = @JoinColumn(name = "team_id"))
+	@Column(name = "member_user_id", nullable = false)
+	private Set<Long> members;
+	
+	@ElementCollection
 	@CollectionTable(name = "coach_current_team", joinColumns = @JoinColumn(name = "team_id"))
 	@Column(name = "coach_id", nullable = false)
 	private Set<Long> coaches;
@@ -76,11 +81,18 @@ public class Team extends AbstractModel {
 	@Column(table = "team_schedule", name = "schedule_id", nullable = false)
 	private Long teamScheduleId;
 	
+	@ElementCollection
+	@CollectionTable(name = "team_news_content", joinColumns = @JoinColumn(name = "team_id"))
+	@Column(name = "news_content_id", nullable = false)
+	private Set<Long> news;
+	
 	/**
 	 * A no-argument constructor
 	 */
 	public Team() {
 		coaches = new HashSet<Long>();
+		members = new HashSet<Long>();
+		news = new HashSet<Long>();
 		players = new HashSet<Long>();
 	}
 	
@@ -97,6 +109,8 @@ public class Team extends AbstractModel {
 	public Team(@Nonnull Long creatorUserId, @Nonnull String name, GenderType gender, @Nonnull Integer ageClass,
 			@Nonnull Long sportTypeId) {
 		coaches = new HashSet<Long>();
+		members = new HashSet<Long>();
+		news = new HashSet<Long>();
 		players = new HashSet<Long>();
 		
 		this.creatorUserId = checkNotNull(creatorUserId, "creator user id cannot be null");
@@ -119,7 +133,9 @@ public class Team extends AbstractModel {
 		result = prime * result + ((creatorUserId == null) ? 0 : creatorUserId.hashCode());
 		result = prime * result + ((departmentId == null) ? 0 : departmentId.hashCode());
 		result = prime * result + ((gender == null) ? 0 : gender.hashCode());
+		result = prime * result + ((members == null) ? 0 : members.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((news == null) ? 0 : news.hashCode());
 		result = prime * result + ((players == null) ? 0 : players.hashCode());
 		result = prime * result + ((sportTypeId == null) ? 0 : sportTypeId.hashCode());
 		result = prime * result + ((teamScheduleId == null) ? 0 : teamScheduleId.hashCode());
@@ -165,10 +181,20 @@ public class Team extends AbstractModel {
 			return false;
 		if (gender != other.gender)
 			return false;
+		if (members == null) {
+			if (other.members != null)
+				return false;
+		} else if (!members.equals(other.members))
+			return false;
 		if (name == null) {
 			if (other.name != null)
 				return false;
 		} else if (!name.equals(other.name))
+			return false;
+		if (news == null) {
+			if (other.news != null)
+				return false;
+		} else if (!news.equals(other.news))
 			return false;
 		if (players == null) {
 			if (other.players != null)
@@ -287,6 +313,20 @@ public class Team extends AbstractModel {
 	}
 
 	/**
+	 * @return the members
+	 */
+	public Set<Long> getMembers() {
+		return members;
+	}
+
+	/**
+	 * @param members the members to set
+	 */
+	public void setMembers(Set<Long> members) {
+		this.members = members;
+	}
+
+	/**
 	 * @return the coaches
 	 */
 	public Set<Long> getCoaches() {
@@ -326,6 +366,20 @@ public class Team extends AbstractModel {
 	 */
 	public void setTeamScheduleId(Long teamScheduleId) {
 		this.teamScheduleId = teamScheduleId;
+	}
+
+	/**
+	 * @return the news
+	 */
+	public Set<Long> getNews() {
+		return news;
+	}
+
+	/**
+	 * @param news the news to set
+	 */
+	public void setNews(Set<Long> news) {
+		this.news = news;
 	}
 	
 }

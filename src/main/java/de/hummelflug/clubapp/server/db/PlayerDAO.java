@@ -53,9 +53,5 @@ public class PlayerDAO extends AbstractSuperDAO<Player> {
 	public Optional<Player> findById(Long id) {
 		return Optional.ofNullable(get(id));
 	}
-	
-	public Player insert(Player player) {
-		return persist(player);
-	}
 
 }

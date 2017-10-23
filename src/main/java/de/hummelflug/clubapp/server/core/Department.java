@@ -43,6 +43,11 @@ public class Department extends AbstractModel {
 	private Long sportTypeId;
 	
 	@ElementCollection
+	@CollectionTable(name = "department_member", joinColumns = @JoinColumn(name = "department_id"))
+	@Column(name = "member_user_id", nullable = false)
+	private Set<Long> members;
+	
+	@ElementCollection
 	@CollectionTable(name = "department_head", joinColumns = @JoinColumn(name = "department_id"))
 	@Column(name = "dep_head_user_id", nullable = false)
 	private Set<Long> head;
@@ -53,11 +58,18 @@ public class Department extends AbstractModel {
 	@Column(name = "team_id", nullable = false)
 	private Set<Long> teams;
 	
+	@ElementCollection
+	@CollectionTable(name = "department_news_content", joinColumns = @JoinColumn(name = "department_id"))
+	@Column(name = "news_content_id", nullable = false)
+	private Set<Long> news;
+	
 	/**
 	 * A no-argument constructor
 	 */
 	public Department() {
 		head = new HashSet<Long>();
+		members = new HashSet<Long>();
+		news = new HashSet<Long>();
 		teams = new HashSet<Long>();
 	}
 
@@ -71,6 +83,8 @@ public class Department extends AbstractModel {
      */
 	public Department(@Nonnull Long creatorUserId, @Nonnull String name, @Nonnull Long sportTypeId) {
 		head = new HashSet<Long>();
+		members = new HashSet<Long>();
+		news = new HashSet<Long>();
 		teams = new HashSet<Long>();
 		
 		this.creatorUserId = checkNotNull(creatorUserId, "creator user id cannot be null");
@@ -88,7 +102,9 @@ public class Department extends AbstractModel {
 		result = prime * result + ((clubId == null) ? 0 : clubId.hashCode());
 		result = prime * result + ((creatorUserId == null) ? 0 : creatorUserId.hashCode());
 		result = prime * result + ((head == null) ? 0 : head.hashCode());
+		result = prime * result + ((members == null) ? 0 : members.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((news == null) ? 0 : news.hashCode());
 		result = prime * result + ((sportTypeId == null) ? 0 : sportTypeId.hashCode());
 		result = prime * result + ((teams == null) ? 0 : teams.hashCode());
 		return result;
@@ -121,10 +137,20 @@ public class Department extends AbstractModel {
 				return false;
 		} else if (!head.equals(other.head))
 			return false;
+		if (members == null) {
+			if (other.members != null)
+				return false;
+		} else if (!members.equals(other.members))
+			return false;
 		if (name == null) {
 			if (other.name != null)
 				return false;
 		} else if (!name.equals(other.name))
+			return false;
+		if (news == null) {
+			if (other.news != null)
+				return false;
+		} else if (!news.equals(other.news))
 			return false;
 		if (sportTypeId == null) {
 			if (other.sportTypeId != null)
@@ -196,6 +222,20 @@ public class Department extends AbstractModel {
 	}
 
 	/**
+	 * @return the members
+	 */
+	public Set<Long> getMembers() {
+		return members;
+	}
+
+	/**
+	 * @param members the members to set
+	 */
+	public void setMembers(Set<Long> members) {
+		this.members = members;
+	}
+
+	/**
 	 * @return the head
 	 */
 	public Set<Long> getHead() {
@@ -221,6 +261,20 @@ public class Department extends AbstractModel {
 	 */
 	public void setTeams(Set<Long> teams) {
 		this.teams = teams;
+	}
+
+	/**
+	 * @return the news
+	 */
+	public Set<Long> getNews() {
+		return news;
+	}
+
+	/**
+	 * @param news the news to set
+	 */
+	public void setNews(Set<Long> news) {
+		this.news = news;
 	}
 	
 }

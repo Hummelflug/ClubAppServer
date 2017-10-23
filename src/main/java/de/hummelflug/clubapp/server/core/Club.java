@@ -40,6 +40,11 @@ public class Club extends AbstractModel {
 	private Date foundationDate;
 	
 	@ElementCollection
+	@CollectionTable(name = "club_member", joinColumns = @JoinColumn(name = "club_id"))
+	@Column(name = "member_user_id", nullable = false)
+	private Set<Long> members;
+	
+	@ElementCollection
 	@CollectionTable(name = "club_board", joinColumns = @JoinColumn(name = "club_id"))
 	@Column(name = "board_user_id", nullable = false)
 	private Set<Long> board;
@@ -73,6 +78,11 @@ public class Club extends AbstractModel {
 	@CollectionTable(name = "club_sport_type", joinColumns = @JoinColumn(name = "club_id"))
 	@Column(name = "sport_type_id", nullable = false)
 	private Set<Long> providedSportTypes;
+	
+	@ElementCollection
+	@CollectionTable(name = "club_news_content", joinColumns = @JoinColumn(name = "club_id"))
+	@Column(name = "news_content_id", nullable = false)
+	private Set<Long> news;
 
 	/**
 	 * A no-argument constructor
@@ -82,6 +92,8 @@ public class Club extends AbstractModel {
 		coaches = new HashSet<Long>();
 		departments = new HashSet<Long>();
 		departmentHeadUsers = new HashSet<Long>();
+		members = new HashSet<Long>();
+		news = new HashSet<Long>();
 		players = new HashSet<Long>();
 		providedSportTypes = new HashSet<Long>();	
 		teams = new HashSet<Long>();
@@ -100,6 +112,8 @@ public class Club extends AbstractModel {
 		coaches = new HashSet<Long>();
 		departments = new HashSet<Long>();
 		departmentHeadUsers = new HashSet<Long>();
+		members = new HashSet<Long>();
+		news = new HashSet<Long>();
 		players = new HashSet<Long>();
 		providedSportTypes = new HashSet<Long>();	
 		teams = new HashSet<Long>();
@@ -122,7 +136,9 @@ public class Club extends AbstractModel {
 		result = prime * result + ((departmentHeadUsers == null) ? 0 : departmentHeadUsers.hashCode());
 		result = prime * result + ((departments == null) ? 0 : departments.hashCode());
 		result = prime * result + ((foundationDate == null) ? 0 : foundationDate.hashCode());
+		result = prime * result + ((members == null) ? 0 : members.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((news == null) ? 0 : news.hashCode());
 		result = prime * result + ((players == null) ? 0 : players.hashCode());
 		result = prime * result + ((providedSportTypes == null) ? 0 : providedSportTypes.hashCode());
 		result = prime * result + ((teams == null) ? 0 : teams.hashCode());
@@ -171,10 +187,20 @@ public class Club extends AbstractModel {
 				return false;
 		} else if (!foundationDate.equals(other.foundationDate))
 			return false;
+		if (members == null) {
+			if (other.members != null)
+				return false;
+		} else if (!members.equals(other.members))
+			return false;
 		if (name == null) {
 			if (other.name != null)
 				return false;
 		} else if (!name.equals(other.name))
+			return false;
+		if (news == null) {
+			if (other.news != null)
+				return false;
+		} else if (!news.equals(other.news))
 			return false;
 		if (players == null) {
 			if (other.players != null)
@@ -234,6 +260,20 @@ public class Club extends AbstractModel {
 	 */
 	public void setFoundationDate(Date foundationDate) {
 		this.foundationDate = foundationDate;
+	}
+
+	/**
+	 * @return the members
+	 */
+	public Set<Long> getMembers() {
+		return members;
+	}
+
+	/**
+	 * @param members the members to set
+	 */
+	public void setMembers(Set<Long> members) {
+		this.members = members;
 	}
 
 	/**
@@ -332,6 +372,20 @@ public class Club extends AbstractModel {
 	 */
 	public void setProvidedSportTypes(Set<Long> providedSportTypes) {
 		this.providedSportTypes = providedSportTypes;
+	}
+
+	/**
+	 * @return the news
+	 */
+	public Set<Long> getNews() {
+		return news;
+	}
+
+	/**
+	 * @param news the news to set
+	 */
+	public void setNews(Set<Long> news) {
+		this.news = news;
 	}
 	
 }

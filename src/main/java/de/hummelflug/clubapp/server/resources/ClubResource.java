@@ -1,5 +1,6 @@
 package de.hummelflug.clubapp.server.resources;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,11 +14,21 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
+import org.glassfish.jersey.media.multipart.FormDataParam;
+
 import de.hummelflug.clubapp.server.core.Club;
+import de.hummelflug.clubapp.server.core.News;
+import de.hummelflug.clubapp.server.core.NewsContent;
 import de.hummelflug.clubapp.server.core.User;
+import de.hummelflug.clubapp.server.core.Vote;
 import de.hummelflug.clubapp.server.facade.ClubFacade;
+import de.hummelflug.clubapp.server.facade.ClubNewsContentFacade;
+import de.hummelflug.clubapp.server.facade.ClubNewsFacade;
+import de.hummelflug.clubapp.server.facade.ClubVoteFacade;
+import de.hummelflug.clubapp.server.utils.NewsFilterOption;
 import de.hummelflug.clubapp.server.utils.UserRole;
 import io.dropwizard.auth.Auth;
 import io.dropwizard.hibernate.UnitOfWork;
@@ -29,9 +40,16 @@ import io.dropwizard.jersey.params.LongParam;
 public class ClubResource {
 
 	private ClubFacade clubFacade;
+	private ClubNewsContentFacade clubNewsContentFacade;
+	private ClubVoteFacade clubVoteFacade;
+	private ClubNewsFacade clubNewsFacade;
 	
-	public ClubResource(ClubFacade clubFacade) {
+	public ClubResource(ClubFacade clubFacade, ClubNewsContentFacade clubNewsContentFacade,
+			ClubNewsFacade clubNewsFacade, ClubVoteFacade clubVoteFacade) {
 		this.clubFacade = clubFacade;
+		this.clubNewsContentFacade = clubNewsContentFacade;
+		this.clubNewsFacade = clubNewsFacade;
+		this.clubVoteFacade = clubVoteFacade;
 	}
 	
 	@POST
@@ -39,7 +57,7 @@ public class ClubResource {
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({ UserRole.Constants.ADMIN_VALUE, UserRole.Constants.BOARD_VALUE })
     @UnitOfWork
-    public Club add(@Auth User user, @Valid Club club) {
+    public Club addClub(@Auth User user, @Valid Club club) {
         return clubFacade.createClub(user.getId(), club);
     }
 	
@@ -98,6 +116,7 @@ public class ClubResource {
         return clubFacade.addCoachToClub(user, clubId.get(), coachId.get());
     }
     
+    @GET
     @Path("/{id}/departmentHead")
     @Produces(MediaType.APPLICATION_JSON)
     @PermitAll
@@ -117,6 +136,65 @@ public class ClubResource {
     }
     
     @GET
+    @Path("/{id}/news_content")
+    @Produces(MediaType.APPLICATION_JSON)
+    @PermitAll
+    @UnitOfWork
+    public List<NewsContent> findNewsContent(@Auth User user, @PathParam("id") LongParam clubId, 
+    		@QueryParam("filter") Optional<String> filter) {
+    	if (filter.isPresent()) {
+    		return clubNewsContentFacade.findClubNewsContent(user, clubId.get(),
+    				NewsFilterOption.fromString(filter.get()));
+    	}
+    	throw new WebApplicationException(400);
+    }
+    
+    @GET
+    @Path("/{id}/news")
+    @Produces(MediaType.APPLICATION_JSON)
+    @PermitAll
+    @UnitOfWork
+    public List<News> findNews(@Auth User user, @PathParam("id") LongParam clubId, 
+    		@QueryParam("filter") Optional<String> filter) {
+    	if (filter.isPresent()) {
+    		return clubNewsFacade.findClubNews(user, clubId.get(), NewsFilterOption.fromString(filter.get()));
+    	}
+    	throw new WebApplicationException(400);
+    }
+    
+    @POST
+    @Path("/{id}/news")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({ UserRole.Constants.ADMIN_VALUE, UserRole.Constants.BOARD_VALUE })
+    @UnitOfWork
+    public News addClubNews(@Auth User user, @PathParam("id") LongParam clubId, @Valid News news) {
+    	return clubNewsFacade.createClubNews(user, clubId.get(), news);
+    }
+    
+    @POST
+    @Path("/{clubid}/news/{newsid}/image")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({ UserRole.Constants.ADMIN_VALUE, UserRole.Constants.BOARD_VALUE })
+    @UnitOfWork
+    public News addClubNewsImage(@Auth User user, @PathParam("clubid") LongParam clubId, 
+    		@PathParam("newsid") LongParam newsId, @FormDataParam("file") final InputStream inputStream) {
+    	return clubNewsFacade.addClubNewsImage(user, clubId.get(), newsId.get(), inputStream);
+    }
+    
+    @POST
+    @Path("/{clubid}/news/{newsid}/reader")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @PermitAll
+    @UnitOfWork
+    public News addClubNewsReader(@Auth User user, @PathParam("clubid") LongParam clubId,
+    		@PathParam("newsid") LongParam newsId) {
+    	return clubNewsFacade.addClubNewsReader(user, clubId.get(), newsId.get());
+    }
+    
+    @GET
     @Path("/{id}/player")
     @Produces(MediaType.APPLICATION_JSON)
     @PermitAll
@@ -133,6 +211,49 @@ public class ClubResource {
     public Club addPlayer(@Auth User user, @PathParam("id") LongParam clubId,
     		@QueryParam("playerId") LongParam playerId) {
         return clubFacade.addPlayerToClub(user, clubId.get(), playerId.get());
+    }
+    
+    @GET
+    @Path("/{id}/vote")
+    @Produces(MediaType.APPLICATION_JSON)
+    @PermitAll
+    @UnitOfWork
+    public List<Vote> findVotes(@Auth User user, @PathParam("id") LongParam clubId, 
+    		@QueryParam("filter") Optional<String> filter) {
+    	if (filter.isPresent()) {
+    		return clubVoteFacade.findClubVotes(user, clubId.get(), NewsFilterOption.fromString(filter.get()));
+    	}
+    	throw new WebApplicationException(400);
+    }
+    
+    @POST
+    @Path("/{id}/vote")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({ UserRole.Constants.ADMIN_VALUE, UserRole.Constants.BOARD_VALUE })
+    @UnitOfWork
+    public Vote addClubVote(@Auth User user, @PathParam("id") LongParam clubId, @Valid Vote vote) {
+    	return clubVoteFacade.createClubVote(user, clubId.get(), vote);
+    }
+    
+    @POST
+    @Path("/{clubid}/vote/{voteid}/close")
+    @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({ UserRole.Constants.ADMIN_VALUE, UserRole.Constants.BOARD_VALUE })
+    @UnitOfWork
+    public Vote closeClubVote(@Auth User user, @PathParam("clubid") LongParam clubId, 
+    		@PathParam("voteid") LongParam voteId) {
+    	return clubVoteFacade.closeClubVote(user, clubId.get(), voteId.get());
+    }
+    
+    @POST
+    @Path("/{clubid}/vote/{voteid}/answer/{answerid}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @PermitAll
+    @UnitOfWork
+    public Vote voteForAnswer(@Auth User user, @PathParam("voteid") LongParam voteId,
+    		@PathParam("answerid") LongParam answerId) {
+    	return clubVoteFacade.voteForAnswer(user, voteId.get(), answerId.get());
     }
 	
 }

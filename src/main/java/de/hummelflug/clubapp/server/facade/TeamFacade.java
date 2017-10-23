@@ -69,6 +69,8 @@ public class TeamFacade {
 			
 			coach.getCurrentTeamsAsCoach().add(team.getId());
 			coach.getTeamHistoryAsCoach().add(team.getId());
+			
+			team.getMembers().add(coachId);
 		} else {
 			throw new WebApplicationException(400);
 		}
@@ -98,6 +100,8 @@ public class TeamFacade {
 			
 			player.getCurrentTeamsAsPlayer().add(team.getId());
 			player.getTeamHistoryAsPlayer().add(team.getId());
+			
+			team.getMembers().add(playerId);
 		} else {
 			throw new WebApplicationException(400);
 		}
@@ -144,6 +148,13 @@ public class TeamFacade {
 			}
 		} else {
 			throw new WebApplicationException(400);
+		}
+		
+		/** Add news **/
+		if (team.getNews() != null) {
+			for (Long newsId : team.getNews()) {
+				newTeam.getNews().add(newsId);
+			}
 		}
 		
 		/** Change current teams and history of coach **/

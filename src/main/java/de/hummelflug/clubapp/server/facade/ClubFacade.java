@@ -54,6 +54,7 @@ public class ClubFacade {
 		if (userOptional.isPresent()) {
 			if (userOptional.get().getUserRoles().contains(UserRole.BOARD)) {
 				club.getBoard().add(boardId);
+				club.getMembers().add(boardId);
 			} else {
 				throw new WebApplicationException(401);
 			}
@@ -88,6 +89,8 @@ public class ClubFacade {
 			
 			coach.getCurrentClubsAsCoach().add(club.getId());
 			coach.getClubHistoryAsCoach().add(club.getId());
+			
+			club.getMembers().add(coachId);
 		} else {
 			throw new WebApplicationException(400);
 		}
@@ -116,6 +119,7 @@ public class ClubFacade {
 		if (userOptional.isPresent()) {
 			if (userOptional.get().getUserRoles().contains(UserRole.DEP_HEAD)) {
 				club.getDepartmentHeadUsers().add(userId);
+				club.getMembers().add(userId);
 			} else {
 				throw new WebApplicationException(401);
 			}
@@ -150,6 +154,8 @@ public class ClubFacade {
 			
 			player.getCurrentClubsAsPlayer().add(club.getId());
 			player.getClubHistoryAsPlayer().add(club.getId());
+			
+			club.getMembers().add(playerId);
 		} else {
 			throw new WebApplicationException(400);
 		}
@@ -197,6 +203,13 @@ public class ClubFacade {
 				for (Long boardId : boardIds) {
 					addBoardToClubSet(newClub, boardId);
 				}
+			}
+		}
+		
+		/** Add news to club **/
+		if (club.getNews() != null) {
+			for (Long newsId : club.getNews()) {
+				newClub.getNews().add(newsId);
 			}
 		}
 			

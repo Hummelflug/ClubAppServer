@@ -7,6 +7,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -47,18 +48,22 @@ public class Event extends AbstractModel {
 	@Enumerated(EnumType.STRING)
 	private EventType eventType;
 	
+	@ElementCollection
 	@CollectionTable(name = "event_participants", joinColumns = @JoinColumn(name = "event_id"))
 	@Column(name = "user_id", nullable = false)
 	private Set<Long> participants;
 	
+	@ElementCollection
 	@CollectionTable(name = "event_confirmation", joinColumns = @JoinColumn(name = "event_id"))
 	@Column(name = "user_id", nullable = false)
 	private Set<Long> confirmedParticipants;
 	
+	@ElementCollection
 	@CollectionTable(name = "event_absence", joinColumns = @JoinColumn(name = "event_id"))
 	@Column(name = "user_id", nullable = false)
 	private Set<Long> absentUsers;
 	
+	@ElementCollection
 	@CollectionTable(name = "event_unknown_status", joinColumns = @JoinColumn(name = "event_id"))
 	@Column(name = "user_id", nullable = false)
 	private Set<Long> undecidedUsers;
