@@ -35,7 +35,8 @@ public class PlayerFacade {
 		Player newPlayer = playerDAO.insert(new Player(player.getLastName(), player.getFirstName(), 
 				player.getBirthday(), player.getEmail().toLowerCase(), 
 				PasswordHashHelper.generatePasswordHash(player.getPassword()), player.getGender(),
-				player.getPosition(), player.getShirtNumber()));
+				player.getPosition(), player.getShirtNumber(), player.getPhone(), player.getStreet(), 
+				player.getPostcode(), player.getCity()));
 		
 		/** Add team/club histories & sportTypes **/
 		for (Long clubId : player.getClubHistoryAsPlayer()) {

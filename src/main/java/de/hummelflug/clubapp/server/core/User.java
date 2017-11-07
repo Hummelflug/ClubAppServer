@@ -63,6 +63,18 @@ public class User extends AbstractModel implements Principal {
 	@Enumerated(EnumType.STRING)
 	private GenderType gender;
 	
+	@Column(name = "phone", nullable = false)
+	private String phone;
+	
+	@Column(name = "street", nullable = false)
+	private String street;
+	
+	@Column(name = "postcode", nullable = false)
+	private String postcode;
+	
+	@Column(name = "city", nullable = false)
+	private String city;
+	
 	@ElementCollection (fetch = FetchType.EAGER, targetClass = UserRole.class)
 	@CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
 	@Column(name = "user_role", nullable = false)
@@ -95,9 +107,14 @@ public class User extends AbstractModel implements Principal {
      * @param password user password
      * @param gender user gender
      * @param userRole user role
+     * @param phone phone number of user
+     * @param street part of address
+     * @param postcode part of address
+     * @param city part of address
      */
 	public User(@Nonnull String lastName, @Nonnull String firstName, @Nonnull Date birthday, @Nonnull String email, 
-			@Nonnull String password, GenderType gender, @Nonnull UserRole userRole) {
+			@Nonnull String password, GenderType gender, @Nonnull String phone, @Nonnull String street,
+			@Nonnull String postcode, @Nonnull String city, @Nonnull UserRole userRole) {
 		this.userRoles = new HashSet<UserRole>();
 		this.userRoles.add(checkNotNull(userRole, "userRole cannot be null"));
 		
@@ -106,7 +123,11 @@ public class User extends AbstractModel implements Principal {
 		this.birthday = checkNotNull(birthday, "birthday cannot be null");
 		this.email = checkNotNull(email, "email cannot be null");
 		this.password = checkNotNull(password, "password cannot be null");
-		this.gender = gender;
+		this.gender = checkNotNull(gender, "gender cannot be null");
+		this.phone = checkNotNull(phone, "phone cannot be null");
+		this.street = checkNotNull(street, "street cannot be null");
+		this.postcode = checkNotNull(postcode, "postcode cannot be null");
+		this.city = checkNotNull(city, "city cannot be null");
 	}
 	
 	/**
@@ -126,11 +147,15 @@ public class User extends AbstractModel implements Principal {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + ((birthday == null) ? 0 : birthday.hashCode());
+		result = prime * result + ((city == null) ? 0 : city.hashCode());
 		result = prime * result + ((email == null) ? 0 : email.hashCode());
 		result = prime * result + ((firstName == null) ? 0 : firstName.hashCode());
 		result = prime * result + ((gender == null) ? 0 : gender.hashCode());
 		result = prime * result + ((lastName == null) ? 0 : lastName.hashCode());
 		result = prime * result + ((password == null) ? 0 : password.hashCode());
+		result = prime * result + ((phone == null) ? 0 : phone.hashCode());
+		result = prime * result + ((postcode == null) ? 0 : postcode.hashCode());
+		result = prime * result + ((street == null) ? 0 : street.hashCode());
 		result = prime * result + ((userRoles == null) ? 0 : userRoles.hashCode());
 		return result;
 	}
@@ -151,6 +176,11 @@ public class User extends AbstractModel implements Principal {
 			if (other.birthday != null)
 				return false;
 		} else if (!birthday.equals(other.birthday))
+			return false;
+		if (city == null) {
+			if (other.city != null)
+				return false;
+		} else if (!city.equals(other.city))
 			return false;
 		if (email == null) {
 			if (other.email != null)
@@ -173,6 +203,21 @@ public class User extends AbstractModel implements Principal {
 			if (other.password != null)
 				return false;
 		} else if (!password.equals(other.password))
+			return false;
+		if (phone == null) {
+			if (other.phone != null)
+				return false;
+		} else if (!phone.equals(other.phone))
+			return false;
+		if (postcode == null) {
+			if (other.postcode != null)
+				return false;
+		} else if (!postcode.equals(other.postcode))
+			return false;
+		if (street == null) {
+			if (other.street != null)
+				return false;
+		} else if (!street.equals(other.street))
 			return false;
 		if (userRoles == null) {
 			if (other.userRoles != null)
@@ -267,6 +312,62 @@ public class User extends AbstractModel implements Principal {
 	}
 
 	/**
+	 * @return the phone
+	 */
+	public String getPhone() {
+		return phone;
+	}
+
+	/**
+	 * @param phone the phone to set
+	 */
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	/**
+	 * @return the street
+	 */
+	public String getStreet() {
+		return street;
+	}
+
+	/**
+	 * @param street the street to set
+	 */
+	public void setStreet(String street) {
+		this.street = street;
+	}
+
+	/**
+	 * @return the postcode
+	 */
+	public String getPostcode() {
+		return postcode;
+	}
+
+	/**
+	 * @param postcode the postcode to set
+	 */
+	public void setPostcode(String postcode) {
+		this.postcode = postcode;
+	}
+
+	/**
+	 * @return the city
+	 */
+	public String getCity() {
+		return city;
+	}
+
+	/**
+	 * @param city the city to set
+	 */
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	/**
 	 * @return the userRoles
 	 */
 	public Set<UserRole> getUserRoles() {
@@ -279,5 +380,5 @@ public class User extends AbstractModel implements Principal {
 	public void setUserRoles(Set<UserRole> userRoles) {
 		this.userRoles = userRoles;
 	}
-	
+
 }

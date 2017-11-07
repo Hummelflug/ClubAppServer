@@ -35,7 +35,8 @@ public class CoachFacade {
 		/** Create coach to get the coach id **/
 		Coach newCoach = coachDAO.insert(new Coach(coach.getLastName(), coach.getFirstName(), coach.getBirthday(),
 				coach.getEmail().toLowerCase(), PasswordHashHelper.generatePasswordHash(coach.getPassword()), 
-				coach.getGender(), coach.getPosition()));
+				coach.getGender(), coach.getPosition(), coach.getPhone(), coach.getStreet(), coach.getPostcode(),
+				coach.getCity()));
 		
 		/** Add team/club histories & sportTypes **/
 		for (Long clubId : coach.getClubHistoryAsCoach()) {

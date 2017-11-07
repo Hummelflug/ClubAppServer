@@ -1,5 +1,8 @@
 package de.hummelflug.clubapp.server;
 
+import java.util.logging.Logger;
+
+import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
@@ -219,6 +222,9 @@ public class ClubAppServerApplication extends Application<ClubAppServerConfigura
         /** Set up authentication **/
         UserAuthenticator authenticator = new UnitOfWorkAwareProxyFactory(hibernateBundle)
         		.create(UserAuthenticator.class, UserDAO.class, userDAO);
+        
+        //Use this for http request debugging to show incomming/outcomming requests (especially jsons)
+        environment.jersey().register(new LoggingFilter(Logger.getLogger("InboundRequestResponse"), true));
         
         environment.jersey().register(new AuthDynamicFeature(
                 new BasicCredentialAuthFilter.Builder<User>()

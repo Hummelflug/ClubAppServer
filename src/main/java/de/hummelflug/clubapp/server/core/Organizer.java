@@ -47,10 +47,16 @@ public class Organizer extends User {
      * @param password organizer password
      * @param gender organizer gender
 	 * @param organization of organizer
+	 * @param phone phone number of user
+     * @param street part of address
+     * @param postcode part of address
+     * @param city part of address
 	 */
 	public Organizer(@Nonnull String lastName, @Nonnull String firstName, @Nonnull Date birthday, @Nonnull String email, 
-			@Nonnull String password, GenderType gender, String organization) {
-		super(lastName, firstName, birthday, email, password, gender, UserRole.ORGANIZER);
+			@Nonnull String password, GenderType gender, String organization, @Nonnull String phone, 
+			@Nonnull String street, @Nonnull String postcode, @Nonnull String city) {
+		super(lastName, firstName, birthday, email, password, gender, phone, street, postcode, city,
+				UserRole.ORGANIZER);
 		this.organization = organization;
 	}
 

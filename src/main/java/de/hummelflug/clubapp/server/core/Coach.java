@@ -9,6 +9,7 @@ import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -42,28 +43,27 @@ public class Coach extends User {
 	@Column(name = "position")
 	private String position;
 	
-	@Cascade({ org.hibernate.annotations.CascadeType.ALL })
-	@ElementCollection
+	@ElementCollection (fetch = FetchType.EAGER)
 	@Column(name = "sport_type_id", nullable = false)
 	@CollectionTable(name = "user_sport_type", joinColumns = @JoinColumn(name = "user_id"))
 	private Set<Long> sportTypes;
 	
-	@ElementCollection
+	@ElementCollection (fetch = FetchType.EAGER)
 	@CollectionTable(name = "coach_current_club", joinColumns = @JoinColumn(name = "coach_id"))
 	@Column(name = "club_id", nullable = false)
 	private Set<Long> currentClubsAsCoach;
 	
-	@ElementCollection
+	@ElementCollection (fetch = FetchType.EAGER)
 	@CollectionTable(name = "coach_current_team", joinColumns = @JoinColumn(name = "coach_id"))
 	@Column(name = "team_id", nullable = false)
 	private Set<Long> currentTeamsAsCoach;
 	
-	@ElementCollection
+	@ElementCollection (fetch = FetchType.EAGER)
 	@CollectionTable(name = "coach_club_history", joinColumns = @JoinColumn(name = "coach_id"))
 	@Column(name = "club_id", nullable = false)
 	private Set<Long> clubHistoryAsCoach;
 	
-	@ElementCollection
+	@ElementCollection (fetch = FetchType.EAGER)
 	@CollectionTable(name = "coach_team_history", joinColumns = @JoinColumn(name = "coach_id"))
 	@Column(name = "team_id", nullable = false)
 	private Set<Long> teamHistoryAsCoach;
@@ -92,10 +92,15 @@ public class Coach extends User {
      * @param password coach password
      * @param gender coach gender
 	 * @param position of the coach
+	 * @param phone phone number of user
+     * @param street part of address
+     * @param postcode part of address
+     * @param city part of address
 	 */
 	public Coach(@Nonnull String lastName, @Nonnull String firstName, @Nonnull Date birthday, @Nonnull String email, 
-			@Nonnull String password, GenderType gender, String position) {
-		super(lastName, firstName, birthday, email, password, gender, UserRole.COACH);
+			@Nonnull String password, GenderType gender, String position, @Nonnull String phone, @Nonnull String street,
+			@Nonnull String postcode, @Nonnull String city) {
+		super(lastName, firstName, birthday, email, password, gender, phone, street, postcode, city,  UserRole.COACH);
 		
 		this.position = position;
 		

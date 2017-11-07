@@ -9,6 +9,7 @@ import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -43,27 +44,27 @@ public class Player extends User {
 	@Column(name = "shirt_number")
 	private Integer shirtNumber;
 	
-	@ElementCollection
+	@ElementCollection (fetch = FetchType.EAGER)
 	@CollectionTable(name = "user_sport_type", joinColumns = @JoinColumn(name = "user_id"))
 	@Column(name = "sport_type_id", nullable = false)
 	private Set<Long> sportTypes;
 	
-	@ElementCollection
+	@ElementCollection (fetch = FetchType.EAGER)
 	@CollectionTable(name = "player_current_club", joinColumns = @JoinColumn(name = "player_id"))
 	@Column(name = "club_id", nullable = false)
 	private Set<Long> currentClubsAsPlayer;
 	
-	@ElementCollection
+	@ElementCollection (fetch = FetchType.EAGER)
 	@CollectionTable(name = "player_current_team", joinColumns = @JoinColumn(name = "player_id"))
 	@Column(name = "team_id", nullable = false)
 	private Set<Long> currentTeamsAsPlayer;
 	
-	@ElementCollection
+	@ElementCollection (fetch = FetchType.EAGER)
 	@CollectionTable(name = "player_club_history", joinColumns = @JoinColumn(name = "player_id"))
 	@Column(name = "club_id", nullable = false)
 	private Set<Long> clubHistoryAsPlayer;
 	
-	@ElementCollection
+	@ElementCollection (fetch = FetchType.EAGER)
 	@CollectionTable(name = "player_team_history", joinColumns = @JoinColumn(name = "player_id"))
 	@Column(name = "team_id", nullable = false)
 	private Set<Long> teamHistoryAsPlayer;
@@ -92,10 +93,15 @@ public class Player extends User {
      * @param gender player gender
 	 * @param position of player
 	 * @param shirtNumber of player
+	 * @param phone phone number of user
+     * @param street part of address
+     * @param postcode part of address
+     * @param city part of address
 	 */
 	public Player(@Nonnull String lastName, @Nonnull String firstName, @Nonnull Date birthday, @Nonnull String email, 
-			@Nonnull String password, GenderType gender, String position, Integer shirtNumber) {
-		super(lastName, firstName, birthday, email, password, gender, UserRole.PLAYER);
+			@Nonnull String password, GenderType gender, String position, Integer shirtNumber, @Nonnull String phone,
+			@Nonnull String street, @Nonnull String postcode, @Nonnull String city) {
+		super(lastName, firstName, birthday, email, password, gender, phone, street, postcode, city, UserRole.PLAYER);
 		this.position = position;
 		this.shirtNumber = shirtNumber;
 		
