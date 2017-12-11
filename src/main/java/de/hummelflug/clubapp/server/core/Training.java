@@ -53,12 +53,16 @@ public class Training extends Event {
 	/**
 	 * 
 	 * @param creatorUserId user id of creator
+	 * @param meetingTime of training
 	 * @param startTime of training
 	 * @param endTime of training
 	 * @param teamId team whose training is defined
+	 * @param title of training
+	 * @param sportTypeId of the game
 	 */
-	public Training(@Nonnull Long creatorUserId, @Nonnull Date startTime, @Nonnull Date endTime, @Nonnull Long teamId) {
-		super(creatorUserId, EventType.TRAINING, startTime, endTime);
+	public Training(@Nonnull Long creatorUserId, @Nonnull Date meetingTime, @Nonnull Date startTime,
+			@Nonnull Date endTime, @Nonnull Long teamId, @Nonnull String title, Long sportTypeId) {
+		super(creatorUserId, EventType.TRAINING, meetingTime, startTime, endTime, title, sportTypeId);
 		
 		this.teamId = checkNotNull(teamId, "team id cannot be null");
 		

@@ -1,13 +1,17 @@
 package de.hummelflug.clubapp.server.facade;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
 
+import de.hummelflug.clubapp.server.core.Club;
 import de.hummelflug.clubapp.server.core.Team;
 import de.hummelflug.clubapp.server.core.User;
 import de.hummelflug.clubapp.server.core.Vote;
+import de.hummelflug.clubapp.server.db.ClubDAO;
 import de.hummelflug.clubapp.server.db.TeamDAO;
 import de.hummelflug.clubapp.server.db.VoteDAO;
 import de.hummelflug.clubapp.server.utils.NewsFilterOption;
@@ -15,11 +19,13 @@ import de.hummelflug.clubapp.server.utils.UserRole;
 
 public class TeamVoteFacade extends AbstractSuperVoteFacade {
 	
+	private final ClubDAO clubDAO;
 	private final TeamDAO teamDAO;
 
-	public TeamVoteFacade(TeamDAO teamDAO, VoteDAO voteDAO) {
+	public TeamVoteFacade(ClubDAO clubDAO, TeamDAO teamDAO, VoteDAO voteDAO) {
 		super(voteDAO);
 
+		this.clubDAO = clubDAO;
 		this.teamDAO = teamDAO;
 	}
 	
@@ -67,6 +73,36 @@ public class TeamVoteFacade extends AbstractSuperVoteFacade {
 				return findVotes(team.getNews(), filter);
 			} else {
 				throw new WebApplicationException(401);
+			}
+		}
+		throw new WebApplicationException(400);
+	}
+	
+	public List<Vote> findTeamVoteByTeamIds(User user, Long clubId, List<Long> teamIds,
+			NewsFilterOption newsFilterOption) {
+		if (user != null && teamIds != null && newsFilterOption != null) {
+			Set<Long> votes = new HashSet<Long>();
+			Club club = getClubById(clubId);
+			for (Long teamId :teamIds) {
+				if (club.getTeams().contains(teamId)) {
+					Team team = getTeamById(teamId);
+					if (checkTeamPermission(user, team)) {
+						votes.addAll(team.getNews());
+					} else {
+						throw new WebApplicationException(401);
+					}
+				}
+			}
+			return findVotes(votes, newsFilterOption);
+		}
+		throw new WebApplicationException(400);
+	}
+	
+	private Club getClubById(Long clubId) {
+		if (clubId != null) {
+			Optional<Club> clubOptional = clubDAO.findById(clubId);
+			if (clubOptional.isPresent()) {
+				return clubOptional.get();
 			}
 		}
 		throw new WebApplicationException(400);

@@ -3,6 +3,7 @@ package de.hummelflug.clubapp.server.resources;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
@@ -13,9 +14,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import de.hummelflug.clubapp.server.core.User;
 import de.hummelflug.clubapp.server.core.UserSchedule;
 import de.hummelflug.clubapp.server.facade.UserScheduleFacade;
 import de.hummelflug.clubapp.server.utils.UserRole;
+import io.dropwizard.auth.Auth;
 import io.dropwizard.hibernate.UnitOfWork;
 import io.dropwizard.jersey.params.LongParam;
 
@@ -38,9 +41,10 @@ public class UserScheduleResource {
 	
     @GET
     @Path("/{id}")
+    @PermitAll
     @UnitOfWork
-    public Optional<UserSchedule> findById(@PathParam("id") LongParam id) {
-        return userScheduleFacade.findUserScheduleById(id.get());
+    public UserSchedule findById(@Auth User user, @PathParam("id") LongParam id) {
+        return userScheduleFacade.findUserSchedule(user, id.get());
     }
     
     @POST

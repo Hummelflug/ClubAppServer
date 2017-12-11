@@ -43,6 +43,19 @@ public class DepartmentDAO extends AbstractSuperDAO<Department> {
 	}
 	
 	/**
+	 * Method looks for a department by newsId
+	 * 
+	 * @param newsId the newsid of a department we are looking for.
+	 * @return Optional containing the found department or an empty Optional
+     * otherwise
+	 */
+	public Optional<Department> findByNewsId(Long newsId) {
+		return namedQuery("de.hummelflug.clubapp.server.core.Department.findByNewsId")
+				.setParameter("newsId", newsId)
+				.setMaxResults(1).uniqueResultOptional();
+	}
+	
+	/**
      * Method looks for a department by id.
      * 
      * @param id the id of a department we are looking for.

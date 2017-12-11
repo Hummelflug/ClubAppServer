@@ -26,7 +26,10 @@ import javax.persistence.Table;
             query = "select d from Department d"),
     @NamedQuery(name = "de.hummelflug.clubapp.server.core.Department.findByName",
             query = "select d from Department d "
-            + "where d.name like :name ")
+            		+ "where d.name like :name "),
+    @NamedQuery(name = "de.hummelflug.clubapp.server.core.Department.findByNewsId",
+    		query = "select d from Department d "
+    				+ "where :newsId member d.news")
 })
 public class Department extends AbstractModel {
 	
@@ -51,7 +54,6 @@ public class Department extends AbstractModel {
 	@CollectionTable(name = "department_head", joinColumns = @JoinColumn(name = "department_id"))
 	@Column(name = "dep_head_user_id", nullable = false)
 	private Set<Long> head;
-
 	
 	@ElementCollection
 	@CollectionTable(name = "department_team", joinColumns = @JoinColumn(name = "department_id"))

@@ -2,7 +2,6 @@ package de.hummelflug.clubapp.server.core;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,8 +38,8 @@ public class News extends NewsContent {
 	@Column(name = "description")
 	private String description;
 	
-	@Column(name = "image")
-	private byte[] image;
+	@Column(name = "image_id")
+	private Long imageId;
 	
 	@ElementCollection
 	@CollectionTable(name = "news_readers", joinColumns = @JoinColumn(name = "news_id"))
@@ -79,7 +78,7 @@ public class News extends NewsContent {
 		int result = super.hashCode();
 		result = prime * result + ((description == null) ? 0 : description.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + Arrays.hashCode(image);
+		result = prime * result + ((imageId == null) ? 0 : imageId.hashCode());
 		result = prime * result + ((newsReaders == null) ? 0 : newsReaders.hashCode());
 		result = prime * result + ((title == null) ? 0 : title.hashCode());
 		return result;
@@ -107,7 +106,10 @@ public class News extends NewsContent {
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
-		if (!Arrays.equals(image, other.image))
+		if (imageId == null) {
+			if (other.imageId != null)
+				return false;
+		} else if (!imageId.equals(other.imageId))
 			return false;
 		if (newsReaders == null) {
 			if (other.newsReaders != null)
@@ -165,17 +167,17 @@ public class News extends NewsContent {
 	}
 
 	/**
-	 * @return the image
+	 * @return the imageId
 	 */
-	public byte[] getImage() {
-		return image;
+	public Long getImageId() {
+		return imageId;
 	}
 
 	/**
-	 * @param image the image to set
+	 * @param imageId the imageId to set
 	 */
-	public void setImage(byte[] image) {
-		this.image = image;
+	public void setImageId(Long imageId) {
+		this.imageId = imageId;
 	}
 
 	/**

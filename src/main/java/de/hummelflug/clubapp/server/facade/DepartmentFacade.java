@@ -74,6 +74,13 @@ public class DepartmentFacade {
 			}
 		}
 		
+		/** Add department members **/
+		if (department.getMembers() != null) {
+			for (Long userId : department.getMembers()) {
+				newDepartment.getMembers().add(userId);
+			}
+		}
+		
 		/** Add teams **/
 		if (department.getTeams() != null) {
 			addTeamToDepartment(user, newDepartment);

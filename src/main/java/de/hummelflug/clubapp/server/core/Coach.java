@@ -17,8 +17,6 @@ import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SecondaryTable;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Cascade;
-
 import de.hummelflug.clubapp.server.utils.GenderType;
 import de.hummelflug.clubapp.server.utils.UserRole;
 
@@ -59,6 +57,11 @@ public class Coach extends User {
 	private Set<Long> currentTeamsAsCoach;
 	
 	@ElementCollection (fetch = FetchType.EAGER)
+	@CollectionTable(name = "department_member", joinColumns = @JoinColumn(name = "member_user_id"))
+	@Column(name = "department_id", nullable = false)
+	private Set<Long> currentDepartments;
+	
+	@ElementCollection (fetch = FetchType.EAGER)
 	@CollectionTable(name = "coach_club_history", joinColumns = @JoinColumn(name = "coach_id"))
 	@Column(name = "club_id", nullable = false)
 	private Set<Long> clubHistoryAsCoach;
@@ -79,6 +82,7 @@ public class Coach extends User {
 		
 		clubHistoryAsCoach = new HashSet<Long>();
 		currentClubsAsCoach = new HashSet<Long>();
+		currentDepartments = new HashSet<Long>();
 		currentTeamsAsCoach = new HashSet<Long>();
 		teamHistoryAsCoach = new HashSet<Long>();
 		sportTypes = new HashSet<Long>();
@@ -106,6 +110,7 @@ public class Coach extends User {
 		
 		clubHistoryAsCoach = new HashSet<Long>();
 		currentClubsAsCoach = new HashSet<Long>();
+		currentDepartments = new HashSet<Long>();
 		currentTeamsAsCoach = new HashSet<Long>();
 		teamHistoryAsCoach = new HashSet<Long>();
 		sportTypes = new HashSet<Long>();
@@ -120,6 +125,7 @@ public class Coach extends User {
 		int result = super.hashCode();
 		result = prime * result + ((clubHistoryAsCoach == null) ? 0 : clubHistoryAsCoach.hashCode());
 		result = prime * result + ((currentClubsAsCoach == null) ? 0 : currentClubsAsCoach.hashCode());
+		result = prime * result + ((currentDepartments == null) ? 0 : currentDepartments.hashCode());
 		result = prime * result + ((currentTeamsAsCoach == null) ? 0 : currentTeamsAsCoach.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((position == null) ? 0 : position.hashCode());
@@ -150,6 +156,11 @@ public class Coach extends User {
 			if (other.currentClubsAsCoach != null)
 				return false;
 		} else if (!currentClubsAsCoach.equals(other.currentClubsAsCoach))
+			return false;
+		if (currentDepartments == null) {
+			if (other.currentDepartments != null)
+				return false;
+		} else if (!currentDepartments.equals(other.currentDepartments))
 			return false;
 		if (currentTeamsAsCoach == null) {
 			if (other.currentTeamsAsCoach != null)
@@ -255,6 +266,20 @@ public class Coach extends User {
 	}
 
 	/**
+	 * @return the currentDepartments
+	 */
+	public Set<Long> getCurrentDepartments() {
+		return currentDepartments;
+	}
+
+	/**
+	 * @param currentDepartments the currentDepartments to set
+	 */
+	public void setCurrentDepartments(Set<Long> currentDepartments) {
+		this.currentDepartments = currentDepartments;
+	}
+
+	/**
 	 * @return the clubHistoryAsCoach
 	 */
 	public Set<Long> getClubHistoryAsCoach() {
@@ -295,5 +320,5 @@ public class Coach extends User {
 	public void setScheduleId(Long scheduleId) {
 		this.scheduleId = scheduleId;
 	}
-
+	
 }

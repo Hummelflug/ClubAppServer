@@ -1,5 +1,6 @@
 package de.hummelflug.clubapp.server.facade;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
@@ -18,8 +19,8 @@ public class ClubNewsFacade extends AbstractSuperNewsFacade {
 	
 	private final ClubDAO clubDAO;
 
-	public ClubNewsFacade(ClubDAO clubDAO, NewsDAO newsDAO) {
-		super(newsDAO);
+	public ClubNewsFacade(ClubDAO clubDAO, ImageFileFacade imageFileFacade, NewsDAO newsDAO) {
+		super(imageFileFacade, newsDAO);
 		
 		this.clubDAO = clubDAO;
 	}
@@ -31,9 +32,15 @@ public class ClubNewsFacade extends AbstractSuperNewsFacade {
 		return false;
 	}
 	
+	private boolean checkValidNewsId(Club club, Long newsId) {
+		return club.getNews().contains(newsId);
+	}
+	
 	public News addClubNewsReader(User user, Long clubId, Long newsId) {
 		if (user != null && clubId != null && newsId != null) {
-			if (checkClubPermission(user, getClubById(clubId)) && !user.getUserRoles().contains(UserRole.ADMIN)) {
+			Club club = getClubById(clubId);
+			if (checkClubPermission(user, club) && !user.getUserRoles().contains(UserRole.ADMIN)
+					&& checkValidNewsId(club, newsId)) {
 				return addNewsReader(user, newsId);
 			} else {
 				throw new WebApplicationException(401);
@@ -44,8 +51,9 @@ public class ClubNewsFacade extends AbstractSuperNewsFacade {
 	
 	public News addClubNewsImage(User user, Long clubId, Long newsId, InputStream fileInputStream) {
 		if (user != null && clubId != null && newsId != null && fileInputStream != null) {
-			if (checkClubPermission(user, getClubById(clubId))) {
-				return this.addNewsImage(newsId, fileInputStream);
+			Club club = getClubById(clubId);
+			if (checkClubPermission(user, club) && checkValidNewsId(club, newsId)) {
+				return this.addNewsImage(user, newsId, fileInputStream);
 			} else {
 				throw new WebApplicationException(401);
 			}
@@ -63,6 +71,18 @@ public class ClubNewsFacade extends AbstractSuperNewsFacade {
 				clubDAO.update(club);
 				
 				return newNews;
+			} else {
+				throw new WebApplicationException(401);
+			}
+		}
+		throw new WebApplicationException(400);
+	}
+	
+	public File downloadImageFile(User user, Long clubId, Long newsId) {
+		if (user != null && clubId != null && newsId != null) {
+			Club club = getClubById(clubId);
+			if (checkClubPermission(user, club) && checkValidNewsId(club, newsId)) {
+				return this.downloadNewsImage(newsId);
 			} else {
 				throw new WebApplicationException(401);
 			}

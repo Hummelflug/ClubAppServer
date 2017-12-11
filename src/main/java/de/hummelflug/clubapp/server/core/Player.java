@@ -60,6 +60,11 @@ public class Player extends User {
 	private Set<Long> currentTeamsAsPlayer;
 	
 	@ElementCollection (fetch = FetchType.EAGER)
+	@CollectionTable(name = "department_member", joinColumns = @JoinColumn(name = "member_user_id"))
+	@Column(name = "department_id", nullable = false)
+	private Set<Long> currentDepartments;
+	
+	@ElementCollection (fetch = FetchType.EAGER)
 	@CollectionTable(name = "player_club_history", joinColumns = @JoinColumn(name = "player_id"))
 	@Column(name = "club_id", nullable = false)
 	private Set<Long> clubHistoryAsPlayer;
@@ -79,6 +84,7 @@ public class Player extends User {
 		super(UserRole.PLAYER);
 		clubHistoryAsPlayer = new HashSet<Long>();
 		currentClubsAsPlayer = new HashSet<Long>();
+		currentDepartments = new HashSet<Long>();
 		currentTeamsAsPlayer = new HashSet<Long>();
 		teamHistoryAsPlayer = new HashSet<Long>();
 		sportTypes = new HashSet<Long>();
@@ -107,6 +113,7 @@ public class Player extends User {
 		
 		clubHistoryAsPlayer = new HashSet<Long>();
 		currentClubsAsPlayer = new HashSet<Long>();
+		currentDepartments = new HashSet<Long>();
 		currentTeamsAsPlayer = new HashSet<Long>();
 		teamHistoryAsPlayer = new HashSet<Long>();
 		sportTypes = new HashSet<Long>();
@@ -121,6 +128,7 @@ public class Player extends User {
 		int result = super.hashCode();
 		result = prime * result + ((clubHistoryAsPlayer == null) ? 0 : clubHistoryAsPlayer.hashCode());
 		result = prime * result + ((currentClubsAsPlayer == null) ? 0 : currentClubsAsPlayer.hashCode());
+		result = prime * result + ((currentDepartments == null) ? 0 : currentDepartments.hashCode());
 		result = prime * result + ((currentTeamsAsPlayer == null) ? 0 : currentTeamsAsPlayer.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((position == null) ? 0 : position.hashCode());
@@ -152,6 +160,11 @@ public class Player extends User {
 			if (other.currentClubsAsPlayer != null)
 				return false;
 		} else if (!currentClubsAsPlayer.equals(other.currentClubsAsPlayer))
+			return false;
+		if (currentDepartments == null) {
+			if (other.currentDepartments != null)
+				return false;
+		} else if (!currentDepartments.equals(other.currentDepartments))
 			return false;
 		if (currentTeamsAsPlayer == null) {
 			if (other.currentTeamsAsPlayer != null)
@@ -273,6 +286,20 @@ public class Player extends User {
 	 */
 	public void setCurrentTeamsAsPlayer(Set<Long> currentTeamsAsPlayer) {
 		this.currentTeamsAsPlayer = currentTeamsAsPlayer;
+	}
+
+	/**
+	 * @return the currentDepartments
+	 */
+	public Set<Long> getCurrentDepartments() {
+		return currentDepartments;
+	}
+
+	/**
+	 * @param currentDepartments the currentDepartments to set
+	 */
+	public void setCurrentDepartments(Set<Long> currentDepartments) {
+		this.currentDepartments = currentDepartments;
 	}
 
 	/**

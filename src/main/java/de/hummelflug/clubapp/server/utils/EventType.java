@@ -1,5 +1,5 @@
 package de.hummelflug.clubapp.server.utils;
 
 public enum EventType {
-	GAME, TRAINING
+	GAME, TRAINING, OTHERS, TOURNAMENT
 }

@@ -1,13 +1,17 @@
 package de.hummelflug.clubapp.server.db;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.persistence.TemporalType;
+
 import org.hibernate.SessionFactory;
 
 import de.hummelflug.clubapp.server.core.Event;
+import de.hummelflug.clubapp.server.utils.EventType;
 
 public class EventDAO extends AbstractSuperDAO<Event> {
 
@@ -41,25 +45,18 @@ public class EventDAO extends AbstractSuperDAO<Event> {
 	}
 	
 	/**
-     * Method returns all events whose id is element of passed parameter.
+     * Method returns 10 upcoming events whose id is element of passed parameter.
      * 
      * @param ids set of ids whose events should be returned
-     * @return list of all events whose id is element of passed parameter
+     * @param types set of event type
+     * @return list of 10 upcoming whose id is element of passed parameter
      */
-	public List<Event> findByIds(Set<Long> ids) {
-		if (ids != null) {
-			List<Event> events = new ArrayList<Event>();
-			for (Long id : ids) {
-				Optional<Event> eventOptional = findById(id);
-				if (eventOptional.isPresent()) {
-					events.add(eventOptional.get());
-				} else {
-					return null;
-				}
-			}
-			return events;
-		}
-		return null;
+	public List<Event> findUpcomingByIds(Set<Long> ids, Set<EventType> types) {
+		return list(namedQuery("de.hummelflug.clubapp.server.core.Event.findUpcomingByIds")
+				.setParameter("ids", ids)
+				.setParameter("types", types)
+				.setParameter("currentTime", new Date(), TemporalType.DATE)
+				.setMaxResults(10));
 	}
 
 }

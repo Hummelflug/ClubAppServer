@@ -18,7 +18,7 @@ How to start the ClubAppServer application in Eclipse
 6. Select *ClubAppServerApplication - de.hummelflug.clubapp.server*
 7. ClubAppServer -> Properties -> Run/Debug Settings -> Edit *ClubAppServerApplication*
 8. Switch to tab *Arguments*: enter `server config.yml` in *Program arguments*
-9. Switch to tab *Environment*: configure database connection (set DBUSER, DBPW, DBURL)
+9. Switch to tab *Environment*: configure database connection (set DBUSER, DBPW, DBURL) and configure path where images should be stored (set IMAGE_PATH) 
 10. Run again
 11. Server is running
 

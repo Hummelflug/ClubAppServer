@@ -19,8 +19,9 @@ public class GameFacade {
 	
 	public Game createGame(User user, Game game) {
 		/** Create game to get the game id **/
-		Game newGame = gameDAO.insert(new Game(user.getId(), game.getStartTime(), game.getEndTime(),
-				game.getHostTeamId(), game.getGuestTeamId()));
+		Game newGame = gameDAO.insert(new Game(user.getId(), game.getMeetingTime(), game.getStartTime(),
+				game.getEndTime(), game.getHostTeamId(), game.getGuestTeamId(), game.getTitle(),
+				game.getSportTypeId()));
 		
 		/** Add organizers **/
 		for (Long organizerId : game.getOrganizers()) {

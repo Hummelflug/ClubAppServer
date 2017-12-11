@@ -193,26 +193,57 @@ public class TeamFacade {
 		return teamDAO.findById(id);
 	}
 	
+	public List<Team> findTeamsByIds(User user, List<Long> ids) {
+		if (user != null && ids != null) {
+			List<Team> teams = new ArrayList<Team>();
+			for (Long id : ids) {
+				Optional<Team> teamOptional = findTeamById(id);
+				if (teamOptional.isPresent()) {
+					Team team = teamOptional.get();
+					if (team.getMembers().contains(user.getId())) {
+						teams.add(team);
+					} else {
+						throw new WebApplicationException(401);
+					}
+				}
+			}
+			return teams;
+		}
+		throw new WebApplicationException(400);
+	}
+	
 	public List<Team> findTeamByName(String name) {
 		return teamDAO.findByName(name);
 	}
 	
-	public List<User> findTeamCoaches(Long teamId) {
-		Optional<Team> teamOptional = findTeamById(teamId);
-		if (teamOptional.isPresent()) {
-			return findTeamUsers(teamOptional.get().getCoaches());
-		} else {
-			throw new WebApplicationException(400);
+	public List<User> findTeamCoaches(User user, Long teamId) {
+		if (user != null && teamId != null) {
+			Optional<Team> teamOptional = findTeamById(teamId);
+			if (teamOptional.isPresent()) {
+				Team team = teamOptional.get();
+				if (team.getMembers().contains(user.getId())) {
+					return findTeamUsers(team.getCoaches());
+				} else {
+					throw new WebApplicationException(401);
+				}
+			}
 		}
+		throw new WebApplicationException(400);
 	}
 	
-	public List<User> findTeamPlayers(Long teamId) {
-		Optional<Team> teamOptional = findTeamById(teamId);
-		if (teamOptional.isPresent()) {
-			return findTeamUsers(teamOptional.get().getPlayers());
-		} else {
-			throw new WebApplicationException(400);
+	public List<User> findTeamPlayers(User user, Long teamId) {
+		if (user != null && teamId != null) {
+			Optional<Team> teamOptional = findTeamById(teamId);
+			if (teamOptional.isPresent()) {
+				Team team = teamOptional.get();
+				if (team.getMembers().contains(user.getId())) {
+					return findTeamUsers(team.getPlayers());
+				} else {
+					throw new WebApplicationException(401);
+				}
+			}
 		}
+		throw new WebApplicationException(400);
 	}
 	
 	private List<User> findTeamUsers(Set<Long> userIds) {
@@ -230,6 +261,30 @@ public class TeamFacade {
 		} else {
 			throw new WebApplicationException(400);
 		}
+	}
+
+	public List<Team> findMyTeams(User user, Long clubId, List<Long> teamIds) {
+		if (user != null && clubId != null && teamIds != null) {
+			Club club = getClubById(clubId);
+			if (club.getMembers().contains(user.getId())) { 
+		        List<Long> intersection = new ArrayList<Long>(club.getTeams());
+		        intersection.retainAll(teamIds);
+		        return findTeamsByIds(user, intersection);
+			} else {
+				throw new WebApplicationException(401);
+			}
+		}
+		throw new WebApplicationException(400);
+	}
+	
+	public Club getClubById(Long clubId) {
+		if (clubId != null) {
+			Optional<Club> clubOptional = clubDAO.findById(clubId);
+			if (clubOptional.isPresent()) {
+				return clubOptional.get();
+			}
+		}
+		throw new WebApplicationException(400);
 	}
 
 }

@@ -1,20 +1,23 @@
 package de.hummelflug.clubapp.server;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.glassfish.jersey.filter.LoggingFilter;
+import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
 import de.hummelflug.clubapp.server.auth.UserAuthenticator;
 import de.hummelflug.clubapp.server.auth.UserAuthorizer;
 import de.hummelflug.clubapp.server.core.Answer;
+import de.hummelflug.clubapp.server.core.BugReport;
 import de.hummelflug.clubapp.server.core.Club;
 import de.hummelflug.clubapp.server.core.Coach;
 import de.hummelflug.clubapp.server.core.Department;
 import de.hummelflug.clubapp.server.core.Event;
 import de.hummelflug.clubapp.server.core.Exercise;
 import de.hummelflug.clubapp.server.core.Game;
+import de.hummelflug.clubapp.server.core.ImageFile;
 import de.hummelflug.clubapp.server.core.News;
 import de.hummelflug.clubapp.server.core.NewsContent;
 import de.hummelflug.clubapp.server.core.Organizer;
@@ -28,12 +31,14 @@ import de.hummelflug.clubapp.server.core.Training;
 import de.hummelflug.clubapp.server.core.User;
 import de.hummelflug.clubapp.server.core.UserSchedule;
 import de.hummelflug.clubapp.server.core.Vote;
+import de.hummelflug.clubapp.server.db.BugReportDAO;
 import de.hummelflug.clubapp.server.db.ClubDAO;
 import de.hummelflug.clubapp.server.db.CoachDAO;
 import de.hummelflug.clubapp.server.db.DepartmentDAO;
 import de.hummelflug.clubapp.server.db.EventDAO;
 import de.hummelflug.clubapp.server.db.ExerciseDAO;
 import de.hummelflug.clubapp.server.db.GameDAO;
+import de.hummelflug.clubapp.server.db.ImageFileDAO;
 import de.hummelflug.clubapp.server.db.NewsContentDAO;
 import de.hummelflug.clubapp.server.db.NewsDAO;
 import de.hummelflug.clubapp.server.db.OrganizerDAO;
@@ -47,6 +52,7 @@ import de.hummelflug.clubapp.server.db.TrainingDAO;
 import de.hummelflug.clubapp.server.db.UserDAO;
 import de.hummelflug.clubapp.server.db.UserScheduleDAO;
 import de.hummelflug.clubapp.server.db.VoteDAO;
+import de.hummelflug.clubapp.server.facade.BugReportFacade;
 import de.hummelflug.clubapp.server.facade.ClubFacade;
 import de.hummelflug.clubapp.server.facade.ClubNewsContentFacade;
 import de.hummelflug.clubapp.server.facade.ClubNewsFacade;
@@ -59,6 +65,7 @@ import de.hummelflug.clubapp.server.facade.DepartmentVoteFacade;
 import de.hummelflug.clubapp.server.facade.EventFacade;
 import de.hummelflug.clubapp.server.facade.ExerciseFacade;
 import de.hummelflug.clubapp.server.facade.GameFacade;
+import de.hummelflug.clubapp.server.facade.ImageFileFacade;
 import de.hummelflug.clubapp.server.facade.OrganizerFacade;
 import de.hummelflug.clubapp.server.facade.PlayerFacade;
 import de.hummelflug.clubapp.server.facade.ScheduleFacade;
@@ -72,12 +79,14 @@ import de.hummelflug.clubapp.server.facade.TournamentFacade;
 import de.hummelflug.clubapp.server.facade.TrainingFacade;
 import de.hummelflug.clubapp.server.facade.UserFacade;
 import de.hummelflug.clubapp.server.facade.UserScheduleFacade;
+import de.hummelflug.clubapp.server.resources.BugReportResource;
 import de.hummelflug.clubapp.server.resources.ClubResource;
 import de.hummelflug.clubapp.server.resources.CoachResource;
 import de.hummelflug.clubapp.server.resources.DepartmentResource;
 import de.hummelflug.clubapp.server.resources.EventResource;
 import de.hummelflug.clubapp.server.resources.ExerciseResource;
 import de.hummelflug.clubapp.server.resources.GameResource;
+import de.hummelflug.clubapp.server.resources.ImageFileResource;
 import de.hummelflug.clubapp.server.resources.NewsContentResource;
 import de.hummelflug.clubapp.server.resources.NewsResource;
 import de.hummelflug.clubapp.server.resources.OrganizerResource;
@@ -112,12 +121,14 @@ public class ClubAppServerApplication extends Application<ClubAppServerConfigura
     private final HibernateBundle<ClubAppServerConfiguration> hibernateBundle
             = new HibernateBundle<ClubAppServerConfiguration>(
             		Answer.class,
+            		BugReport.class,
             		Club.class,
             		Coach.class,
             		Department.class,
             		Event.class,
             		Exercise.class,
             		Game.class,
+            		ImageFile.class,
             		News.class,
             		NewsContent.class,
             		Organizer.class,
@@ -168,12 +179,14 @@ public class ClubAppServerApplication extends Application<ClubAppServerConfigura
     public void run(final ClubAppServerConfiguration configuration,
                     final Environment environment) throws Exception {
     	/** Init Daos **/
+    	final BugReportDAO bugReportDAO = new BugReportDAO(hibernateBundle.getSessionFactory());
     	final ClubDAO clubDAO = new ClubDAO(hibernateBundle.getSessionFactory());
     	final CoachDAO coachDAO = new CoachDAO(hibernateBundle.getSessionFactory());
     	final DepartmentDAO departmentDAO = new DepartmentDAO(hibernateBundle.getSessionFactory());
     	final EventDAO eventDAO = new EventDAO(hibernateBundle.getSessionFactory());
     	final ExerciseDAO exerciseDAO = new ExerciseDAO(hibernateBundle.getSessionFactory());
     	final GameDAO gameDAO = new GameDAO(hibernateBundle.getSessionFactory());
+    	final ImageFileDAO imageFileDAO = new ImageFileDAO(hibernateBundle.getSessionFactory());
     	final NewsDAO newsDAO = new NewsDAO(hibernateBundle.getSessionFactory());
     	final NewsContentDAO newsContentDAO = new NewsContentDAO(hibernateBundle.getSessionFactory());
     	final OrganizerDAO organizerDAO = new OrganizerDAO(hibernateBundle.getSessionFactory());
@@ -188,21 +201,24 @@ public class ClubAppServerApplication extends Application<ClubAppServerConfigura
         final UserScheduleDAO userScheduleDAO = new UserScheduleDAO(hibernateBundle.getSessionFactory());
         final VoteDAO voteDAO = new VoteDAO(hibernateBundle.getSessionFactory());
         
-        /** Init Facades **/
+        /** Initialize Facades **/
+        final ImageFileFacade imageFileFacade = new ImageFileFacade(imageFileDAO);
         final UserScheduleFacade userScheduleFacade = new UserScheduleFacade(userScheduleDAO);
         final TeamScheduleFacade teamScheduleFacade = new TeamScheduleFacade(coachDAO, playerDAO, teamDAO,
         		teamScheduleDAO, userScheduleFacade);
         
+        final BugReportFacade bugReportFacade = new BugReportFacade(bugReportDAO);
         final ClubFacade clubFacade = new ClubFacade(clubDAO, coachDAO, playerDAO, userDAO);
         final ClubNewsContentFacade clubNewsContentFacade = new ClubNewsContentFacade(clubDAO, newsContentDAO);
-        final ClubNewsFacade clubNewsFacade = new ClubNewsFacade(clubDAO, newsDAO);
+        final ClubNewsFacade clubNewsFacade = new ClubNewsFacade(clubDAO, imageFileFacade, newsDAO);
         final ClubVoteFacade clubVoteFacade = new ClubVoteFacade(clubDAO, voteDAO);
         final CoachFacade coachFacade = new CoachFacade(clubDAO, coachDAO, teamDAO, userScheduleDAO);
         final DepartmentFacade departmentFacade = new DepartmentFacade(clubDAO, departmentDAO, teamDAO);
         final DepartmentNewsContentFacade departmentNewsContentFacade = new DepartmentNewsContentFacade(departmentDAO,
         		newsContentDAO);
-        final DepartmentNewsFacade departmentNewsFacade = new DepartmentNewsFacade(departmentDAO, newsDAO);
-        final DepartmentVoteFacade departmentVoteFacade = new DepartmentVoteFacade(departmentDAO, voteDAO);
+        final DepartmentNewsFacade departmentNewsFacade = new DepartmentNewsFacade(clubDAO, departmentDAO,
+        		imageFileFacade, newsDAO);
+        final DepartmentVoteFacade departmentVoteFacade = new DepartmentVoteFacade(clubDAO, departmentDAO, voteDAO);
         final EventFacade eventFacade = new EventFacade(eventDAO);
         final ExerciseFacade exerciseFacade = new ExerciseFacade(exerciseDAO);
         final GameFacade gameFacade = new GameFacade(gameDAO, teamScheduleFacade);
@@ -213,18 +229,20 @@ public class ClubAppServerApplication extends Application<ClubAppServerConfigura
         final TeamFacade teamFacade = new TeamFacade(clubDAO, coachDAO, departmentDAO,
         		playerDAO, teamDAO, teamScheduleDAO, userDAO);  
         final TeamNewsContentFacade teamNewsContentFacade = new TeamNewsContentFacade(newsContentDAO, teamDAO);
-        final TeamNewsFacade teamNewsFacade = new TeamNewsFacade(newsDAO, teamDAO);
-        final TeamVoteFacade teamVoteFacade = new TeamVoteFacade(teamDAO, voteDAO);  
+        final TeamNewsFacade teamNewsFacade = new TeamNewsFacade(clubDAO, imageFileFacade, newsDAO, teamDAO);
+        final TeamVoteFacade teamVoteFacade = new TeamVoteFacade(clubDAO, teamDAO, voteDAO);  
         final TournamentFacade tournamentFacade = new TournamentFacade(tournamentDAO);
         final TrainingFacade trainingFacade = new TrainingFacade(teamScheduleFacade, trainingDAO);
         final UserFacade userFacade = new UserFacade(userDAO);
         
+        /** Logs of incoming requests **/
+        //TODO: remove in production
+        environment.jersey().register(new LoggingFeature(Logger.getLogger(LoggingFeature.DEFAULT_LOGGER_NAME), 
+        		Level.INFO, LoggingFeature.Verbosity.PAYLOAD_ANY, LoggingFeature.DEFAULT_MAX_ENTITY_SIZE));
+        
         /** Set up authentication **/
         UserAuthenticator authenticator = new UnitOfWorkAwareProxyFactory(hibernateBundle)
         		.create(UserAuthenticator.class, UserDAO.class, userDAO);
-        
-        //Use this for http request debugging to show incomming/outcomming requests (especially jsons)
-        environment.jersey().register(new LoggingFilter(Logger.getLogger("InboundRequestResponse"), true));
         
         environment.jersey().register(new AuthDynamicFeature(
                 new BasicCredentialAuthFilter.Builder<User>()
@@ -235,18 +253,20 @@ public class ClubAppServerApplication extends Application<ClubAppServerConfigura
         environment.jersey().register(RolesAllowedDynamicFeature.class);
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
         
-        /** Set up for image upload **/
+        /** Set up image upload **/
         environment.jersey().register(MultiPartFeature.class);
         
         /** Register resources **/
+        environment.jersey().register(new BugReportResource(bugReportFacade));
         environment.jersey().register(new ClubResource(clubFacade, clubNewsContentFacade, clubNewsFacade,
-        		clubVoteFacade));
+        		clubVoteFacade, departmentNewsFacade, departmentVoteFacade, teamNewsFacade, teamVoteFacade));
         environment.jersey().register(new CoachResource(coachFacade));
         environment.jersey().register(new DepartmentResource(departmentFacade, departmentNewsContentFacade, 
         		departmentNewsFacade, departmentVoteFacade));
         environment.jersey().register(new EventResource(eventFacade));
         environment.jersey().register(new ExerciseResource(exerciseFacade));
         environment.jersey().register(new GameResource(gameFacade));
+        environment.jersey().register(new ImageFileResource(imageFileFacade));
         environment.jersey().register(new OrganizerResource(organizerFacade));
         environment.jersey().register(new NewsResource(newsDAO));
         environment.jersey().register(new NewsContentResource(newsContentDAO));
@@ -258,7 +278,7 @@ public class ClubAppServerApplication extends Application<ClubAppServerConfigura
         environment.jersey().register(new TeamScheduleResource(teamScheduleFacade));
         environment.jersey().register(new TournamentResource(tournamentFacade));
         environment.jersey().register(new TrainingResource(trainingFacade));
-        environment.jersey().register(new UserResource(userFacade));
+        environment.jersey().register(new UserResource(imageFileFacade, userFacade));
         environment.jersey().register(new UserScheduleResource(userScheduleFacade));
         environment.jersey().register(new VoteResource(voteDAO));
         

@@ -1,5 +1,6 @@
 package de.hummelflug.clubapp.server.resources;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +29,10 @@ import de.hummelflug.clubapp.server.facade.ClubFacade;
 import de.hummelflug.clubapp.server.facade.ClubNewsContentFacade;
 import de.hummelflug.clubapp.server.facade.ClubNewsFacade;
 import de.hummelflug.clubapp.server.facade.ClubVoteFacade;
+import de.hummelflug.clubapp.server.facade.DepartmentNewsFacade;
+import de.hummelflug.clubapp.server.facade.DepartmentVoteFacade;
+import de.hummelflug.clubapp.server.facade.TeamNewsFacade;
+import de.hummelflug.clubapp.server.facade.TeamVoteFacade;
 import de.hummelflug.clubapp.server.utils.NewsFilterOption;
 import de.hummelflug.clubapp.server.utils.UserRole;
 import io.dropwizard.auth.Auth;
@@ -43,13 +48,22 @@ public class ClubResource {
 	private ClubNewsContentFacade clubNewsContentFacade;
 	private ClubVoteFacade clubVoteFacade;
 	private ClubNewsFacade clubNewsFacade;
+	private DepartmentNewsFacade departmentNewsFacade;
+	private DepartmentVoteFacade departmentVoteFacade;
+	private TeamNewsFacade teamNewsFacade;
+	private TeamVoteFacade teamVoteFacade;
 	
 	public ClubResource(ClubFacade clubFacade, ClubNewsContentFacade clubNewsContentFacade,
-			ClubNewsFacade clubNewsFacade, ClubVoteFacade clubVoteFacade) {
+			ClubNewsFacade clubNewsFacade, ClubVoteFacade clubVoteFacade, DepartmentNewsFacade departmentNewsFacade,
+			DepartmentVoteFacade departmentVoteFacade, TeamNewsFacade teamNewsFacade, TeamVoteFacade teamVoteFacade) {
 		this.clubFacade = clubFacade;
 		this.clubNewsContentFacade = clubNewsContentFacade;
 		this.clubNewsFacade = clubNewsFacade;
 		this.clubVoteFacade = clubVoteFacade;
+		this.departmentNewsFacade = departmentNewsFacade;
+		this.departmentVoteFacade = departmentVoteFacade;
+		this.teamNewsFacade = teamNewsFacade;
+		this.teamVoteFacade = teamVoteFacade;
 	}
 	
 	@POST
@@ -135,6 +149,54 @@ public class ClubResource {
         return clubFacade.addDepartmentHeadToClub(user, clubId.get(), departmentHeadId.get());
     }
     
+	@GET
+    @Path("/{clubid}/department/news")
+    @Produces(MediaType.APPLICATION_JSON)
+    @PermitAll
+    @UnitOfWork
+    public List<News> findNewsByDepartmentIds(@Auth User user, @PathParam("clubid") LongParam clubId,
+    		@QueryParam("departmentids") List<Long> departmentIds, @QueryParam("filter") Optional<String> filter) {
+    	if (filter.isPresent() && departmentIds != null) {
+    		return departmentNewsFacade.findDepartmentNewsByDepartmentIds(user, clubId.get(), departmentIds,
+    				NewsFilterOption.fromString(filter.get()));
+    	}
+    	throw new WebApplicationException(400);
+    }
+	
+	@POST
+    @Path("/{clubid}/department/news/{newsid}/reader")
+    @Produces(MediaType.APPLICATION_JSON)
+    @PermitAll
+    @UnitOfWork
+    public News addDepartmentNewsReader(@Auth User user, @PathParam("clubid") LongParam clubId,
+    		@PathParam("newsid") LongParam newsId) {
+    	return departmentNewsFacade.addDepartmentNewsReaderByClubId(user, clubId.get(), newsId.get());
+    }
+	
+    @GET
+    @Path("/{clubid}/team/news")
+    @Produces(MediaType.APPLICATION_JSON)
+    @PermitAll
+    @UnitOfWork
+    public List<News> findNewsByTeamIds(@Auth User user, @PathParam("clubid") LongParam clubId, 
+    		@QueryParam("teamids") List<Long> teamIds, @QueryParam("filter") Optional<String> filter) {
+    	if (clubId != null && filter.isPresent() && teamIds != null) {
+    		return teamNewsFacade.findTeamNewsByTeamIds(user, clubId.get(), teamIds,
+    				NewsFilterOption.fromString(filter.get()));
+    	}
+    	throw new WebApplicationException(400);
+    }
+    
+    @POST
+    @Path("/{clubid}/team/news/{newsid}/reader")
+    @Produces(MediaType.APPLICATION_JSON)
+    @PermitAll
+    @UnitOfWork
+    public News addTeamNewsReader(@Auth User user, @PathParam("clubid") LongParam clubId,
+    		@PathParam("newsid") LongParam newsId) {
+    	return teamNewsFacade.addTeamNewsReaderByClubId(user, clubId.get(), newsId.get());
+    }
+    
     @GET
     @Path("/{id}/news_content")
     @Produces(MediaType.APPLICATION_JSON)
@@ -172,6 +234,16 @@ public class ClubResource {
     	return clubNewsFacade.createClubNews(user, clubId.get(), news);
     }
     
+    @GET
+    @Path("/{clubid}/news/{newsid}/image.jpg")
+	@Produces("image/jpg")
+    @PermitAll
+    @UnitOfWork
+    public File download(@Auth User user, @PathParam("clubid") LongParam clubId,
+    		@PathParam("newsid") LongParam newsId) {
+        return clubNewsFacade.downloadImageFile(user, clubId.get(), newsId.get());
+    }
+    
     @POST
     @Path("/{clubid}/news/{newsid}/image")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -185,7 +257,6 @@ public class ClubResource {
     
     @POST
     @Path("/{clubid}/news/{newsid}/reader")
-    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @PermitAll
     @UnitOfWork
@@ -226,6 +297,35 @@ public class ClubResource {
     	throw new WebApplicationException(400);
     }
     
+    @GET
+    @Path("/{clubid}/department/vote")
+    @Produces(MediaType.APPLICATION_JSON)
+    @PermitAll
+    @UnitOfWork
+    public List<Vote> findVotesByDepartmentIds(@Auth User user, @PathParam("clubid") LongParam clubId,
+    		@QueryParam("departmentids") List<Long> departmentIds, @QueryParam("filter") Optional<String> filter) {
+    	if (filter.isPresent() && departmentIds != null) {
+    		return departmentVoteFacade.findDepartmentVoteByDepartmentIds(user, clubId.get(), departmentIds,
+    				NewsFilterOption.fromString(filter.get()));
+    	}
+    	throw new WebApplicationException(400);
+    }
+	
+    @GET
+    @Path("/{clubid}/team/vote")
+    @Produces(MediaType.APPLICATION_JSON)
+    @PermitAll
+    @UnitOfWork
+    public List<Vote> findVotesByTeamIds(@Auth User user, @PathParam("clubid") LongParam clubId, 
+    		@QueryParam("teamids") List<Long> teamIds, @QueryParam("filter") Optional<String> filter) {
+    	if (filter.isPresent() && teamIds != null) {
+    		System.out.println(teamIds);
+    		return teamVoteFacade.findTeamVoteByTeamIds(user, clubId.get(), teamIds,
+    				NewsFilterOption.fromString(filter.get()));
+    	}
+    	throw new WebApplicationException(400);
+    }
+    
     @POST
     @Path("/{id}/vote")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -247,7 +347,7 @@ public class ClubResource {
     }
     
     @POST
-    @Path("/{clubid}/vote/{voteid}/answer/{answerid}")
+    @Path("/vote/{voteid}/answer/{answerid}")
     @Produces(MediaType.APPLICATION_JSON)
     @PermitAll
     @UnitOfWork

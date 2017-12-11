@@ -18,8 +18,9 @@ public class TrainingFacade {
 	}
 	
 	public Training createTraining(User user, Training training) {
-		Training newTraining = trainingDAO.insert(new Training(user.getId(), training.getStartTime(),
-				training.getEndTime(), training.getTeamId()));
+		Training newTraining = trainingDAO.insert(new Training(user.getId(), training.getMeetingTime(), 
+				training.getStartTime(), training.getEndTime(), training.getTeamId(), training.getTitle(),
+				training.getSportTypeId()));
 		
 		/** Add exercises **/
 		for (Long exerciseId : training.getExercises()) {

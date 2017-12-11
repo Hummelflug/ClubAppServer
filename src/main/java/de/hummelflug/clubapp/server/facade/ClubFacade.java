@@ -9,6 +9,7 @@ import javax.ws.rs.WebApplicationException;
 
 import de.hummelflug.clubapp.server.core.Club;
 import de.hummelflug.clubapp.server.core.Coach;
+import de.hummelflug.clubapp.server.core.News;
 import de.hummelflug.clubapp.server.core.Player;
 import de.hummelflug.clubapp.server.core.User;
 import de.hummelflug.clubapp.server.db.ClubDAO;
@@ -299,4 +300,5 @@ public class ClubFacade {
 			throw new WebApplicationException(400);
 		}
 	}
+
 }

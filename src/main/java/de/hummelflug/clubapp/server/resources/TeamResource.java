@@ -1,5 +1,6 @@
 package de.hummelflug.clubapp.server.resources;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
@@ -72,6 +73,19 @@ public class TeamResource {
         }
 	}
 	
+	@GET
+    @Path("/myteams")
+    @Produces(MediaType.APPLICATION_JSON)
+    @PermitAll
+    @UnitOfWork
+    public List<Team> findMyTeamsByClubId(@Auth User user, @QueryParam("clubid") Optional<Long> clubId,
+    		@QueryParam("teamids") List<Long> teamIds) {
+    	if (clubId.isPresent()) {
+    		return teamFacade.findMyTeams(user, clubId.get(), teamIds);
+    	}
+    	throw new WebApplicationException(400);
+    }
+	
     @GET
     @Path("/{id}")
     @PermitAll
@@ -85,8 +99,8 @@ public class TeamResource {
     @Produces(MediaType.APPLICATION_JSON)
     @PermitAll
     @UnitOfWork
-    public List<User> findCoaches(@PathParam("id") LongParam teamId) {
-        return teamFacade.findTeamCoaches(teamId.get());
+    public List<User> findCoaches(@Auth User user, @PathParam("id") LongParam teamId) {
+        return teamFacade.findTeamCoaches(user, teamId.get());
     }
     
     @POST
@@ -114,6 +128,15 @@ public class TeamResource {
     }
     
     @GET
+    @Path("/news/{newsid}/image.jpg")
+	@Produces("image/jpg")
+	@PermitAll
+    @UnitOfWork
+    public File downloadImageByNewsId(@Auth User user, @PathParam("newsid") LongParam newsId) {
+        return teamNewsFacade.downloadImageFileByNewsId(user, newsId.get());
+    }
+    
+    @GET
     @Path("/{id}/news")
     @Produces(MediaType.APPLICATION_JSON)
     @PermitAll
@@ -135,6 +158,16 @@ public class TeamResource {
     @UnitOfWork
     public News addTeamNews(@Auth User user, @PathParam("id") LongParam teamId, @Valid News news) {
     	return teamNewsFacade.createTeamNews(user, teamId.get(), news);
+    }
+    
+    @GET
+    @Path("/{teamid}/news/{newsid}/image.jpg")
+	@Produces("image/jpg")
+    @PermitAll
+    @UnitOfWork
+    public File download(@Auth User user, @PathParam("teamid") LongParam teamId,
+    		@PathParam("newsid") LongParam newsId) {
+        return teamNewsFacade.downloadImageFile(user, teamId.get(), newsId.get());
     }
     
     @POST
@@ -164,8 +197,8 @@ public class TeamResource {
     @Produces(MediaType.APPLICATION_JSON)
     @PermitAll
     @UnitOfWork
-    public List<User> findPlayers(@PathParam("id") LongParam teamId) {
-        return teamFacade.findTeamPlayers(teamId.get());
+    public List<User> findPlayers(@Auth User user, @PathParam("id") LongParam teamId) {
+        return teamFacade.findTeamPlayers(user, teamId.get());
     }
     
     @POST
@@ -212,7 +245,7 @@ public class TeamResource {
     }
     
     @POST
-    @Path("/{teamid}/vote/{voteid}/answer/{answerid}")
+    @Path("/vote/{voteid}/answer/{answerid}")
     @Produces(MediaType.APPLICATION_JSON)
     @PermitAll
     @UnitOfWork

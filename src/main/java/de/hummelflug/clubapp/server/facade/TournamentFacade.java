@@ -16,9 +16,9 @@ public class TournamentFacade {
 	}
 	
 	public Tournament createTournament(User user, Tournament tournament) {
-		Tournament newTournament = tournamentDAO.insert(new Tournament(user.getId(), tournament.getName(),
-				tournament.getStartDate(), tournament.getEndDate(), tournament.getMaxNumTeams(),
-				tournament.getMaxRosterSize()));
+		Tournament newTournament = tournamentDAO.insert(new Tournament(user.getId(), tournament.getMeetingTime(),
+				tournament.getStartTime(), tournament.getEndTime(), tournament.getTitle(), tournament.getMaxNumTeams(),
+				tournament.getMaxRosterSize(), tournament.getSportTypeId()));
 		
 		for (Long sportTypeId : tournament.getSportTypes()) {
 			newTournament.getSportTypes().add(sportTypeId);

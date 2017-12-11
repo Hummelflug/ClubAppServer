@@ -1,5 +1,6 @@
 package de.hummelflug.clubapp.server.resources;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
@@ -94,6 +95,15 @@ public class DepartmentResource {
     }
 	
 	@GET
+    @Path("/news/{newsid}/image.jpg")
+	@Produces("image/jpg")
+	@PermitAll
+    @UnitOfWork
+    public File downloadImageByNewsId(@Auth User user, @PathParam("newsid") LongParam newsId) {
+        return departmentNewsFacade.downloadImageFileByNewsId(user, newsId.get());
+    }
+	
+	@GET
     @Path("/{id}/news")
     @Produces(MediaType.APPLICATION_JSON)
     @PermitAll
@@ -101,7 +111,7 @@ public class DepartmentResource {
     public List<News> findNews(@Auth User user, @PathParam("id") LongParam departmentId, 
     		@QueryParam("filter") Optional<String> filter) {
     	if (filter.isPresent()) {
-    		return departmentNewsFacade.findDepartmentNews(user, departmentId.get(),
+    		return departmentNewsFacade.findDepartmentNewsById(user, departmentId.get(),
     				NewsFilterOption.fromString(filter.get()));
     	}
     	throw new WebApplicationException(400);
@@ -115,6 +125,16 @@ public class DepartmentResource {
     @UnitOfWork
     public News addDepartmentNews(@Auth User user, @PathParam("id") LongParam departmentId, @Valid News news) {
     	return departmentNewsFacade.createDepartmentNews(user, departmentId.get(), news);
+    }
+	
+	@GET
+    @Path("/{departmentid}/news/{newsid}/image.jpg")
+	@Produces("image/jpg")
+	@PermitAll
+    @UnitOfWork
+    public File download(@Auth User user, @PathParam("departmentid") LongParam departmentId,
+    		@PathParam("newsid") LongParam newsId) {
+        return departmentNewsFacade.downloadImageFile(user, departmentId.get(), newsId.get());
     }
 	
 	@POST
@@ -174,7 +194,7 @@ public class DepartmentResource {
     }
 	
 	@POST
-    @Path("/{departmentid}/vote/{voteid}/answer/{answerid}")
+    @Path("/vote/{voteid}/answer/{answerid}")
     @Produces(MediaType.APPLICATION_JSON)
     @PermitAll
     @UnitOfWork

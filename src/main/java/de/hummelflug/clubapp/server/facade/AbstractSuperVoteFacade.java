@@ -96,17 +96,26 @@ public static final Integer NEWSCOUNT = AbstractSuperNewsContentFacade.NEWSCOUNT
 			if (voteOptional.isPresent()) {
 				Vote vote = voteOptional.get();
 				if (vote.getStatus().equals(VoteStatus.OPEN) && vote.getVoteParticipants().contains(user.getId())) {
+					boolean isValidAnswerOfVote = false;
 					for (Answer answer : vote.getAnswers()) {
 						if (answer.getId() == answerId) {
-							answer.getVoters().add(user.getId());
-							if (vote.getVoteNoAnswer().contains(user.getId())) {
-								vote.getVoteNoAnswer().remove(user.getId());
-							}
-						} else if (answer.getVoters().contains(user.getId())) {
-							answer.getVoters().remove(user.getId());
+							isValidAnswerOfVote = true;
+							break;
 						}
 					}
-					return voteDAO.update(vote);
+					if (isValidAnswerOfVote) {
+						for (Answer answer : vote.getAnswers()) {
+							if (answer.getId() == answerId) {
+								answer.getVoters().add(user.getId());
+								if (vote.getVoteNoAnswer().contains(user.getId())) {
+									vote.getVoteNoAnswer().remove(user.getId());
+								}
+							} else if (answer.getVoters().contains(user.getId())) {
+								answer.getVoters().remove(user.getId());
+							}
+						}
+						return voteDAO.update(vote);
+					}
 				} else {
 					throw new WebApplicationException(401);
 				}

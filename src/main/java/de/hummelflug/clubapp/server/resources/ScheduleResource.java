@@ -48,13 +48,14 @@ public class ScheduleResource {
     }
     
     @GET
-    @Path("/{id}/event")
+    @Path("/{id}/events")
     @Produces(MediaType.APPLICATION_JSON)
     @PermitAll
     @UnitOfWork
     public List<Event> findEvents(@Auth User user, @PathParam("id") LongParam scheduleId) {
-    	return scheduleFacade.findAllEventsByType(user, scheduleId.get(),
-    			new HashSet<EventType>(Arrays.asList(new EventType[] { EventType.GAME, EventType.TRAINING })));
+    	return scheduleFacade.findUpcomingEventsByType(user, scheduleId.get(),
+    			new HashSet<EventType>(Arrays.asList(new EventType[] { EventType.GAME, EventType.OTHERS,
+    					EventType.TRAINING, EventType.TOURNAMENT })));
     }
     
     @GET
@@ -63,7 +64,7 @@ public class ScheduleResource {
     @PermitAll
     @UnitOfWork
     public List<Event> findGames(@Auth User user, @PathParam("id") LongParam scheduleId) {
-    	return scheduleFacade.findAllEventsByType(user, scheduleId.get(),
+    	return scheduleFacade.findUpcomingEventsByType(user, scheduleId.get(),
     			new HashSet<EventType>(Arrays.asList(new EventType[] { EventType.GAME })));
     }
     
@@ -73,8 +74,28 @@ public class ScheduleResource {
     @PermitAll
     @UnitOfWork
     public List<Event> findTrainings(@Auth User user, @PathParam("id") LongParam scheduleId) {
-    	return scheduleFacade.findAllEventsByType(user, scheduleId.get(),
+    	return scheduleFacade.findUpcomingEventsByType(user, scheduleId.get(),
     			new HashSet<EventType>(Arrays.asList(new EventType[] { EventType.TRAINING })));
+    }
+    
+    @GET
+    @Path("/{id}/tournament")
+    @Produces(MediaType.APPLICATION_JSON)
+    @PermitAll
+    @UnitOfWork
+    public List<Event> findTournament(@Auth User user, @PathParam("id") LongParam scheduleId) {
+    	return scheduleFacade.findUpcomingEventsByType(user, scheduleId.get(),
+    			new HashSet<EventType>(Arrays.asList(new EventType[] { EventType.TOURNAMENT })));
+    }
+    
+    @GET
+    @Path("/{id}/others")
+    @Produces(MediaType.APPLICATION_JSON)
+    @PermitAll
+    @UnitOfWork
+    public List<Event> findOthers(@Auth User user, @PathParam("id") LongParam scheduleId) {
+    	return scheduleFacade.findUpcomingEventsByType(user, scheduleId.get(),
+    			new HashSet<EventType>(Arrays.asList(new EventType[] { EventType.OTHERS })));
     }
 	
 }

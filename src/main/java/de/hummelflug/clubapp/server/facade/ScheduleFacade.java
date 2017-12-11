@@ -27,7 +27,7 @@ public class ScheduleFacade {
 		this.scheduleDAO = scheduleDAO;
 	}
 	
-	public List<Event> findAllEventsByType(User user, Long scheduleId, Set<EventType> eventTypes) {
+	public List<Event> findUpcomingEventsByType(User user, Long scheduleId, Set<EventType> eventTypes) {
 		Optional<Schedule> scheduleOptional = scheduleDAO.findById(scheduleId);
 		if (scheduleOptional.isPresent() && eventTypes != null) {
 			Schedule schedule = scheduleOptional.get();
@@ -41,18 +41,7 @@ public class ScheduleFacade {
 			}
 			
 			/** Create event list **/
-			List<Event> events = new ArrayList<Event>();
-			for (Long eventId : schedule.getEvents()) {
-				Optional<Event> eventOptional = eventDAO.findById(eventId);
-				if (eventOptional.isPresent()) {
-					if (eventTypes.contains(eventOptional.get().getEventType())) {
-						events.add(eventOptional.get());
-					}
-				} else {
-					throw new WebApplicationException(400);
-				}
-			}
-			return events;
+			return eventDAO.findUpcomingByIds(schedule.getEvents(), eventTypes);
 		}
 		throw new WebApplicationException(400);
 	}

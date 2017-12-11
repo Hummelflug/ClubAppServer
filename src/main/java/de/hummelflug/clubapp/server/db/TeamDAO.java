@@ -44,6 +44,19 @@ public class TeamDAO extends AbstractSuperDAO<Team> {
 	}
 	
 	/**
+	 * Method looks for a department by newsId
+	 * 
+	 * @param newsId the newsid of a department we are looking for.
+	 * @return Optional containing the found department or an empty Optional
+     * otherwise
+	 */
+	public Optional<Team> findByNewsId(Long newsId) {
+		return namedQuery("de.hummelflug.clubapp.server.core.Team.findByNewsId")
+				.setParameter("newsId", newsId)
+				.setMaxResults(1).uniqueResultOptional();
+	}
+	
+	/**
      * Method looks for a team by id.
      * 
      * @param id the id of a team we are looking for.

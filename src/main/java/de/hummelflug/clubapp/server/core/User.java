@@ -18,6 +18,8 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.SecondaryTable;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -30,6 +32,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Entity
 @Table(name = "user")
 @Inheritance(strategy=InheritanceType.JOINED)
+@SecondaryTable(name = "user_image",
+		pkJoinColumns=@PrimaryKeyJoinColumn(name="user_id", referencedColumnName="id"))
 @NamedQueries({
     @NamedQuery(name = "de.hummelflug.clubapp.server.core.User.findAll",
             query = "select u from User u order by u.id asc"),
@@ -80,6 +84,9 @@ public class User extends AbstractModel implements Principal {
 	@Column(name = "user_role", nullable = false)
 	@Enumerated(EnumType.STRING)
 	private Set<UserRole> userRoles;
+	
+	@Column(table = "user_image", name = "image_id", nullable = false)
+	private Long imageId;
 	
 	/**
 	 * A no-argument constructor
@@ -151,6 +158,7 @@ public class User extends AbstractModel implements Principal {
 		result = prime * result + ((email == null) ? 0 : email.hashCode());
 		result = prime * result + ((firstName == null) ? 0 : firstName.hashCode());
 		result = prime * result + ((gender == null) ? 0 : gender.hashCode());
+		result = prime * result + ((imageId == null) ? 0 : imageId.hashCode());
 		result = prime * result + ((lastName == null) ? 0 : lastName.hashCode());
 		result = prime * result + ((password == null) ? 0 : password.hashCode());
 		result = prime * result + ((phone == null) ? 0 : phone.hashCode());
@@ -193,6 +201,11 @@ public class User extends AbstractModel implements Principal {
 		} else if (!firstName.equals(other.firstName))
 			return false;
 		if (gender != other.gender)
+			return false;
+		if (imageId == null) {
+			if (other.imageId != null)
+				return false;
+		} else if (!imageId.equals(other.imageId))
 			return false;
 		if (lastName == null) {
 			if (other.lastName != null)
@@ -379,6 +392,20 @@ public class User extends AbstractModel implements Principal {
 	 */
 	public void setUserRoles(Set<UserRole> userRoles) {
 		this.userRoles = userRoles;
+	}
+
+	/**
+	 * @return the imageId
+	 */
+	public Long getImageId() {
+		return imageId;
+	}
+
+	/**
+	 * @param imageId the imageId to set
+	 */
+	public void setImageId(Long imageId) {
+		this.imageId = imageId;
 	}
 
 }

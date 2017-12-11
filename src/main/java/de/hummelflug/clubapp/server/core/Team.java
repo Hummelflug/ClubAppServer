@@ -37,7 +37,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
             query = "select t from Team t"),
     @NamedQuery(name = "de.hummelflug.clubapp.server.core.Team.findByName",
             query = "select t from Team t "
-            + "where t.name like :name ")
+            + "where t.name like :name "),
+    @NamedQuery(name = "de.hummelflug.clubapp.server.core.Team.findByNewsId",
+			query = "select t from Team t "
+			+ "where :newsId member t.news")
 })
 public class Team extends AbstractModel {
 	
